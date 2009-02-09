@@ -24,7 +24,7 @@ int use_nested_cascade = 0;
 void detect_and_draw( IplImage* image );
 
 const char* cascade_name =
-    "../opencv-1.1.0/data/haarcascades/haarcascade_frontalface_alt.xml";
+    "haarcascade_frontalface_alt.xml";
 /* "haarcascade_frontalface_alt.xml";*/
 /*    "haarcascade_profileface.xml";*/
 const char* nested_cascade_name =
