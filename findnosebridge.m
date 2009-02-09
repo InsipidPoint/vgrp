@@ -37,9 +37,9 @@ b1 = b1 + size(im,1)/4;
 
 % im11 = im1(size(im1,1)/5:size(im1,1)*4/5,size(im1,2)/8:size(im1,2)*4/8);
 % im12 = im1(size(im1,1)/5:size(im1,1)*4/5,size(im1,2)*4/8:size(im1,2)*7/8);
-figure;imshow(im1(size(im1,1)/4:size(im1,1)*3/4,size(im1,2)/8:size(im1,2)*7/8));
-figure;imshow(im11);
-figure;imshow(im12);
+% figure;imshow(im1(size(im1,1)/4:size(im1,1)*3/4,size(im1,2)/8:size(im1,2)*7/8));
+% figure;imshow(im11);
+% figure;imshow(im12);
 % [y1 i1] = min(im11);
 % [y2 i2] = min(y1);
 % a1 = i2;
