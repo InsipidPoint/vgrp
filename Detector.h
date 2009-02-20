@@ -7,7 +7,10 @@
 typedef struct _features {
   int face_size;
   CvPoint face_position;
+  CvPoint nostril_positions[2];
   CvPoint lip_positions[2];
+  CvPoint nose_bridge;
+  CvPoint pupils[2];
 } Features;
 
 class Detector {
@@ -19,6 +22,9 @@ public:
 private:
   void FindFace(IplImage *img, Features& features);
   void FindLips(IplImage *face_img, Features& features);
+	void FindNostrils(IplImage *face_img, Features &features);
+	void FindNoseBridge(IplImage *face_img, Features& features);
+	void FindPupils(IplImage *face_img, Features& features);
   
   CvMemStorage* storage;
   CvHaarClassifierCascade* cascade;

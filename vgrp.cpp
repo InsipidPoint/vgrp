@@ -27,6 +27,17 @@ void DrawFace(IplImage *img, Features &f) {
   // draw lips
   cvCircle(img, cvPoint(f.lip_positions[0].x,f.lip_positions[0].y), 1, colors[1], 3, 8, 0);
   cvCircle(img, cvPoint(f.lip_positions[1].x,f.lip_positions[1].y), 1, colors[1], 3, 8, 0);
+	// draw nostrils
+	cvCircle(img, cvPoint(f.nostril_positions[0].x,f.nostril_positions[0].y), 1, colors[0], 3, 8, 0);
+	cvCircle(img, cvPoint(f.nostril_positions[1].x,f.nostril_positions[1].y), 1, colors[0], 3, 8, 0);
+	
+	// draw nose bridge
+	cvCircle(img, cvPoint(f.nose_bridge.x,f.nose_bridge.y), 1, colors[2], 3, 8, 0);
+
+	// draw pupils
+	cvCircle(img, cvPoint(f.pupils[0].x,f.pupils[0].y), 10, colors[3], 3, 8, 0);
+	cvCircle(img, cvPoint(f.pupils[1].x,f.pupils[1].y), 10, colors[3], 3, 8, 0);
+
 }
 
 int main(int argc, char **argv) {
