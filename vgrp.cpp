@@ -38,6 +38,10 @@ void DrawFace(IplImage *img, Features &f) {
 	cvCircle(img, cvPoint(f.pupils[0].x,f.pupils[0].y), 10, colors[3], 3, 8, 0);
 	cvCircle(img, cvPoint(f.pupils[1].x,f.pupils[1].y), 10, colors[3], 3, 8, 0);
 
+	// draw eyebrow ends
+	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[4], 3, 8, 0);
+	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[4], 3, 8, 0);
+	
 }
 
 int main(int argc, char **argv) {

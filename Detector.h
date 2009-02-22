@@ -11,6 +11,7 @@ typedef struct _features {
   CvPoint lip_positions[2];
   CvPoint nose_bridge;
   CvPoint pupils[2];
+  CvPoint eyebrow_ends[2];
 } Features;
 
 class Detector {
@@ -25,6 +26,7 @@ private:
 	void FindNostrils(IplImage *face_img, Features &features);
 	void FindNoseBridge(IplImage *face_img, Features& features);
 	void FindPupils(IplImage *face_img, Features& features);
+	void FindEyebrowEnds(IplImage *face_img, Features& features);
   
   CvMemStorage* storage;
   CvHaarClassifierCascade* cascade;
