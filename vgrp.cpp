@@ -27,6 +27,7 @@ void DrawFace(IplImage *img, Features &f) {
   // draw lips
   cvCircle(img, cvPoint(f.lip_positions[0].x,f.lip_positions[0].y), 1, colors[1], 3, 8, 0);
   cvCircle(img, cvPoint(f.lip_positions[1].x,f.lip_positions[1].y), 1, colors[1], 3, 8, 0);
+  
 	// draw nostrils
 	cvCircle(img, cvPoint(f.nostril_positions[0].x,f.nostril_positions[0].y), 1, colors[0], 3, 8, 0);
 	cvCircle(img, cvPoint(f.nostril_positions[1].x,f.nostril_positions[1].y), 1, colors[0], 3, 8, 0);
@@ -56,19 +57,26 @@ int main(int argc, char **argv) {
   IplImage *small_img = cvCreateImage(cvSize(640,480), 8, 3);
   Camera cam(filename);
   Detector detector;
+  Features f;
+  int track = 0;
   
   while((current_frame = cam.GetFrame())) {
     cvResize(current_frame, small_img, CV_INTER_LINEAR);
     cvCvtColor(small_img, gray, CV_BGR2GRAY);
     cvEqualizeHist(gray,gray);
-    Features f = detector.ColdStart(gray);
+    
+    if(track)
+      detector.TrackFeatures(gray, f);
+    else
+      f = detector.ColdStart(gray);
     
     if(f.face_size) {
       DrawFace(small_img, f);
     }
-//    printf("(%d,%d) %d\n",f.face_position.x,f.face_position.y,f.face_size);
+
     cvShowImage(WINDOW_NAME, small_img);
-    cvWaitKey(10);
+    if(cvWaitKey(10) == 't')
+      track = 1;
   }
   
   cvReleaseImage( &gray );
