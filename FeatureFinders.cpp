@@ -6,7 +6,7 @@
 void Detector::FindFace(IplImage *img, Features& features) {
   cvClearMemStorage(storage);
   CvSeq* faces = cvHaarDetectObjects( img, cascade, storage,
-                                      1.1, 2, CV_HAAR_DO_CANNY_PRUNING ,cvSize(30, 30) );
+                                      1.1, 2, CV_HAAR_DO_CANNY_PRUNING ,cvSize(80, 80) );
   if(faces && faces->total) {
       CvRect* r = (CvRect*)cvGetSeqElem(faces, 0);
       features.face_size = r->width;
@@ -119,7 +119,7 @@ void findLeftBottom(IplImage *image, int nlabels, int& posx, int& posy) {
 	}
 	posx = (int)(xmean/num);
 	posy = (int)(ymean/num);
-	std::cout<<"Left Bottom"<<std::endl;
+//	std::cout<<"Left Bottom"<<std::endl;
 }
 
 void findRightBottom(IplImage *image, int nlabels, int& posx, int& posy) {
@@ -159,7 +159,7 @@ void findRightBottom(IplImage *image, int nlabels, int& posx, int& posy) {
 	}
 	posx = (int)(xmean/num);
 	posy = (int)(ymean/num);
-	std::cout<<"Right Bottom"<<std::endl;
+//	std::cout<<"Right Bottom"<<std::endl;
 
 }
 

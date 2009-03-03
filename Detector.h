@@ -28,8 +28,6 @@ private:
 	void FindNoseBridge(IplImage *face_img, Features& features);
 	void FindPupils(IplImage *face_img, Features& features);
 	void FindEyebrowEnds(IplImage *face_img, Features& features);
-	
-  void TrackLips(IplImage *img, Features& features);
   
   CvMemStorage* storage;
   CvHaarClassifierCascade* cascade;

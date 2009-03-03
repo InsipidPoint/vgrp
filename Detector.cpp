@@ -27,6 +27,5 @@ Features Detector::ColdStart(IplImage *img) {
 }
 
 void Detector::TrackFeatures(IplImage *img, Features& features) {
-  TrackLips(img, features);
-}
   
+}

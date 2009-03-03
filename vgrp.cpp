@@ -36,8 +36,8 @@ void DrawFace(IplImage *img, Features &f) {
 	cvCircle(img, cvPoint(f.nose_bridge.x,f.nose_bridge.y), 1, colors[2], 3, 8, 0);
 
 	// draw pupils
-	cvCircle(img, cvPoint(f.pupils[0].x,f.pupils[0].y), 10, colors[3], 3, 8, 0);
-	cvCircle(img, cvPoint(f.pupils[1].x,f.pupils[1].y), 10, colors[3], 3, 8, 0);
+	cvCircle(img, cvPoint(f.pupils[0].x,f.pupils[0].y), 1, colors[3], 3, 8, 0);
+	cvCircle(img, cvPoint(f.pupils[1].x,f.pupils[1].y), 1, colors[3], 3, 8, 0);
 
 	// draw eyebrow ends
 	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[4], 3, 8, 0);
@@ -58,10 +58,11 @@ int main(int argc, char **argv) {
   Camera cam(filename);
   Detector detector;
   Features f;
-  int track = 0;
+  bool track = false;
   
   while((current_frame = cam.GetFrame())) {
     cvResize(current_frame, small_img, CV_INTER_LINEAR);
+    cvFlip(small_img, small_img, 1);
     cvCvtColor(small_img, gray, CV_BGR2GRAY);
     cvEqualizeHist(gray,gray);
     
@@ -76,7 +77,7 @@ int main(int argc, char **argv) {
 
     cvShowImage(WINDOW_NAME, small_img);
     if(cvWaitKey(10) == 't')
-      track = 1;
+      track = true;
   }
   
   cvReleaseImage( &gray );
