@@ -23,40 +23,43 @@ void rot_z(double theta, double pt[3]) {
 }
 
 void Detector::GetModel(Features& features, double model[9][3]) {
-  model[0][0] = features.nostril_positions[0].x;
-  model[0][1] = features.nostril_positions[0].y;
+  double center_x = cvRound(features.face_position.x + 0.5*features.face_size);
+  double center_y = cvRound(features.face_position.y + 0.5*features.face_size);
+  
+  model[0][0] = features.nostril_positions[0].x - center_x;
+  model[0][1] = features.nostril_positions[0].y - center_y;
   model[0][2] = 1;
   
-  model[1][0] = features.nostril_positions[1].x;
-  model[1][1] = features.nostril_positions[1].y;
+  model[1][0] = features.nostril_positions[1].x - center_x;
+  model[1][1] = features.nostril_positions[1].y - center_y;
   model[1][2] = 1;
   
-  model[2][0] = features.lip_positions[0].x;
-  model[2][1] = features.lip_positions[0].y;
+  model[2][0] = features.lip_positions[0].x - center_x;
+  model[2][1] = features.lip_positions[0].y - center_y;
   model[2][2] = 1;
   
-  model[3][0] = features.lip_positions[1].x;
-  model[3][1] = features.lip_positions[1].y;
+  model[3][0] = features.lip_positions[1].x - center_x;
+  model[3][1] = features.lip_positions[1].y - center_y;
   model[3][2] = 1;
   
-  model[4][0] = features.nose_bridge.x;
-  model[4][1] = features.nose_bridge.y;
+  model[4][0] = features.nose_bridge.x - center_x;
+  model[4][1] = features.nose_bridge.y - center_y;
   model[4][2] = 1;
   
-  model[5][0] = features.pupils[0].x;
-  model[5][1] = features.pupils[0].y;
+  model[5][0] = features.pupils[0].x - center_x;
+  model[5][1] = features.pupils[0].y - center_y;
   model[5][2] = 1;
   
-  model[6][0] = features.pupils[1].x;
-  model[6][1] = features.pupils[1].y;
+  model[6][0] = features.pupils[1].x - center_x;
+  model[6][1] = features.pupils[1].y - center_y;
   model[6][2] = 1;
   
-  model[7][0] = features.eyebrow_ends[0].x;
-  model[7][1] = features.eyebrow_ends[0].y;
+  model[7][0] = features.eyebrow_ends[0].x - center_x;
+  model[7][1] = features.eyebrow_ends[0].y - center_y;
   model[7][2] = 1;
   
-  model[8][0] = features.eyebrow_ends[1].x;
-  model[8][1] = features.eyebrow_ends[1].y;
+  model[8][0] = features.eyebrow_ends[1].x - center_x;
+  model[8][1] = features.eyebrow_ends[1].y - center_y;
   model[8][2] = 1;
 }
 
@@ -79,6 +82,7 @@ void Detector::FitModel(Features& features, double model[9][3], double theta[3])
   double observed[9][3], new_theta[3], scores[9];
   double min_val = 9999999;
   GetModel(features,observed);
+  
   for(double tx = theta[0]-RANGE; tx <= theta[0]+RANGE; tx += 0.05) {
     for(double ty = theta[1]-RANGE; ty <= theta[1]+RANGE; ty += 0.05) {
       for(double tz = theta[2]-RANGE; tz <= theta[2]+RANGE; tz += 0.05) {
@@ -100,5 +104,10 @@ void Detector::FitModel(Features& features, double model[9][3], double theta[3])
         }
       }
     }
+    
+    printf("%f %f %f\n", new_theta[0], new_theta[1], new_theta[2]);
+    theta[0] = new_theta[0];
+    theta[1] = new_theta[1];
+    theta[2] = new_theta[2];
   }
 }

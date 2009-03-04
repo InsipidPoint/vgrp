@@ -20,7 +20,8 @@ public:
   ~Detector();
   
   Features ColdStart(IplImage *img);
-  void TrackFeatures(IplImage *img, Features& features);
+  void TrackFeatures(IplImage *img, Features& features, double model[9][3], double theta[3]);
+  void GetModel(Features& features, double model[9][3]);
 private:
   void FindFace(IplImage *img, Features& features);
   void FindLips(IplImage *face_img, Features& features);
@@ -29,7 +30,6 @@ private:
 	void FindPupils(IplImage *face_img, Features& features);
 	void FindEyebrowEnds(IplImage *face_img, Features& features);
 	
-  void GetModel(Features& features, double model[9][3]);
   void FitModel(Features& features, double model[9][3], double theta[3]);
   
   CvMemStorage* storage;

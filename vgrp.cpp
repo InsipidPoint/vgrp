@@ -59,6 +59,8 @@ int main(int argc, char **argv) {
   Detector detector;
   Features f;
   bool track = false;
+  double model[9][3];
+  double theta[3];
   
   while((current_frame = cam.GetFrame())) {
     cvResize(current_frame, small_img, CV_INTER_LINEAR);
@@ -66,10 +68,12 @@ int main(int argc, char **argv) {
     cvCvtColor(small_img, gray, CV_BGR2GRAY);
     cvEqualizeHist(gray,gray);
     
-    if(track)
-      detector.TrackFeatures(gray, f);
-    else
+    if(track) {
+      detector.TrackFeatures(gray, f, model, theta);
+    } else {
       f = detector.ColdStart(gray);
+      detector.GetModel(f, model);
+    }
     
     if(f.face_size) {
       DrawFace(small_img, f);

@@ -26,6 +26,6 @@ Features Detector::ColdStart(IplImage *img) {
   return features;
 }
 
-void Detector::TrackFeatures(IplImage *img, Features& features) {
+void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][3], double theta[3]) {
   
 }
