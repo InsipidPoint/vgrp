@@ -22,6 +22,83 @@ void rot_z(double theta, double pt[3]) {
   pt[2] = p2;
 }
 
-void Detector::FitModel(Features& features, Features& model) {
+void Detector::GetModel(Features& features, double model[9][3]) {
+  model[0][0] = features.nostril_positions[0].x;
+  model[0][1] = features.nostril_positions[0].y;
+  model[0][2] = 1;
   
+  model[1][0] = features.nostril_positions[1].x;
+  model[1][1] = features.nostril_positions[1].y;
+  model[1][2] = 1;
+  
+  model[2][0] = features.lip_positions[0].x;
+  model[2][1] = features.lip_positions[0].y;
+  model[2][2] = 1;
+  
+  model[3][0] = features.lip_positions[1].x;
+  model[3][1] = features.lip_positions[1].y;
+  model[3][2] = 1;
+  
+  model[4][0] = features.nose_bridge.x;
+  model[4][1] = features.nose_bridge.y;
+  model[4][2] = 1;
+  
+  model[5][0] = features.pupils[0].x;
+  model[5][1] = features.pupils[0].y;
+  model[5][2] = 1;
+  
+  model[6][0] = features.pupils[1].x;
+  model[6][1] = features.pupils[1].y;
+  model[6][2] = 1;
+  
+  model[7][0] = features.eyebrow_ends[0].x;
+  model[7][1] = features.eyebrow_ends[0].y;
+  model[7][2] = 1;
+  
+  model[8][0] = features.eyebrow_ends[1].x;
+  model[8][1] = features.eyebrow_ends[1].y;
+  model[8][2] = 1;
+}
+
+void copy_arrays(double s[9][3], double d[9][3]) {
+  for(size_t i = 0; i < 9; ++i)
+  {
+    for(size_t j = 0; j < 3; ++j)
+    {
+      d[i][j] = s[i][j];
+    }
+  }
+}
+
+int compare(const void * a, const void * b) {
+  return int(*(double*)a - *(double*)b);
+}
+
+#define RANGE 0.3
+void Detector::FitModel(Features& features, double model[9][3], double theta[3]) {
+  double observed[9][3], new_theta[3], scores[9];
+  double min_val = 9999999;
+  GetModel(features,observed);
+  for(double tx = theta[0]-RANGE; tx <= theta[0]+RANGE; tx += 0.05) {
+    for(double ty = theta[1]-RANGE; ty <= theta[1]+RANGE; ty += 0.05) {
+      for(double tz = theta[2]-RANGE; tz <= theta[2]+RANGE; tz += 0.05) {
+        double model_copy[9][3], score;
+        copy_arrays(model,model_copy);
+        for(size_t i = 0; i < 9; ++i) {
+          rot_x(tx,model_copy[i]);
+          rot_y(ty,model_copy[i]);
+          rot_z(tz,model_copy[i]);
+          scores[i] = abs(observed[i][0] - model_copy[i][0]) + abs(observed[i][1] - model_copy[i][1]);
+        }
+        qsort(scores, 9, sizeof(double), compare);
+        score = scores[0]+scores[1]+scores[2]+scores[3];
+        if(min_val > score) {
+          min_val = score;
+          new_theta[0] = tx;
+          new_theta[1] = ty;
+          new_theta[2] = tz;
+        }
+      }
+    }
+  }
 }

@@ -29,7 +29,8 @@ private:
 	void FindPupils(IplImage *face_img, Features& features);
 	void FindEyebrowEnds(IplImage *face_img, Features& features);
 	
-  void FitModel(Features& features, Features& model);
+  void GetModel(Features& features, double model[9][3]);
+  void FitModel(Features& features, double model[9][3], double theta[3]);
   
   CvMemStorage* storage;
   CvHaarClassifierCascade* cascade;
