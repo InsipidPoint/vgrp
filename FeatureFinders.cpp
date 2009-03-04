@@ -6,7 +6,7 @@
 void Detector::FindFace(IplImage *img, Features& features) {
   cvClearMemStorage(storage);
   CvSeq* faces = cvHaarDetectObjects( img, cascade, storage,
-                                      1.1, 2, CV_HAAR_DO_CANNY_PRUNING ,cvSize(80, 80) );
+                                      1.1, 2, CV_HAAR_DO_CANNY_PRUNING ,cvSize(120, 120) );
   if(faces && faces->total) {
       CvRect* r = (CvRect*)cvGetSeqElem(faces, 0);
       features.face_size = r->width;
