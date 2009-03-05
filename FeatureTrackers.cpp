@@ -83,6 +83,10 @@ void Detector::FitModel(Features& features, double model[9][3], double theta[3])
   double min_val = 9999999;
   GetModel(features,observed);
   
+  //remove
+  double center_x = cvRound(features.face_position.x + 0.5*features.face_size);
+  double center_y = cvRound(features.face_position.y + 0.5*features.face_size);
+  
   for(double tx = theta[0]-RANGE; tx <= theta[0]+RANGE; tx += 0.05) {
     for(double ty = theta[1]-RANGE; ty <= theta[1]+RANGE; ty += 0.05) {
       for(double tz = theta[2]-RANGE; tz <= theta[2]+RANGE; tz += 0.05) {
@@ -101,6 +105,16 @@ void Detector::FitModel(Features& features, double model[9][3], double theta[3])
           new_theta[0] = tx;
           new_theta[1] = ty;
           new_theta[2] = tz;
+          
+          // remove
+          features.eyebrow_ends[0].x = model[7][0] + center_x;
+          features.eyebrow_ends[0].y = model[7][1] + center_y;
+          features.eyebrow_ends[1].x = model[8][0] + center_x;
+          features.eyebrow_ends[1].y = model[8][1] + center_y;
+          features.lip_positions[0].x = model[2][0] + center_x;
+          features.lip_positions[0].y = model[2][1] + center_y;
+          features.lip_positions[1].x = model[3][0] + center_x;
+          features.lip_positions[2].y = model[3][1] + center_y;
         }
       }
     }

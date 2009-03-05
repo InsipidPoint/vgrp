@@ -27,5 +27,5 @@ Features Detector::ColdStart(IplImage *img) {
 }
 
 void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][3], double theta[3]) {
-  
+  FitModel(features, model, theta);
 }
