@@ -21,6 +21,7 @@ public:
   
   Features ColdStart(IplImage *img);
   void TrackFeatures(IplImage *img, Features& features, double model[9][3], double theta[3]);
+	void SetupTracking(IplImage *img, Features& features);
   void GetModel(Features& features, double model[9][3]);
 private:
   void FindFace(IplImage *img, Features& features);
@@ -34,4 +35,15 @@ private:
   
   CvMemStorage* storage;
   CvHaarClassifierCascade* cascade;
+	
+	IplImage *grey, *prev_grey, *pyramid, *prev_pyramid, *swap_temp;
+	
+	int win_size;
+	int MAX_COUNT;
+	CvPoint2D32f* points[2], *swap_points;
+	char* status;
+	int count;
+	int flags;
+	
+	
 };

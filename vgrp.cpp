@@ -83,8 +83,11 @@ int main(int argc, char **argv) {
     }
 
     cvShowImage(WINDOW_NAME, small_img);
-    if(cvWaitKey(10) == 't')
-      track = true;
+	  if(cvWaitKey(10) == 't') {
+		  printf("Here\n");
+		  track = true;
+		  detector.SetupTracking(gray,f);
+	  }
   }
   
   cvReleaseImage( &gray );
