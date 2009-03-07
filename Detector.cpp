@@ -28,7 +28,7 @@ Features Detector::ColdStart(IplImage *img) {
   return features;
 }
 
-void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][3], double theta[3]) {
+void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][3], double theta[3]) {  
   	grey = cvCloneImage(img);
 	cvCalcOpticalFlowPyrLK( prev_grey, grey, prev_pyramid, pyramid,
 						   points[0], points[1], count, cvSize(win_size,win_size), 3, status, 0,
@@ -58,6 +58,7 @@ void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][
 	features.eyebrow_ends[0] = cvPointFrom32f(points[0][7]);
 	features.eyebrow_ends[1] = cvPointFrom32f(points[0][8]);
 	
+	FitModel(features, model, theta);
 }
 
 void Detector::SetupTracking(IplImage *img, Features& features) {	

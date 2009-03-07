@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
   Features f;
   bool track = false;
   double model[9][3];
-  double theta[3];
+  double theta[3] = {0,0,0};
   
   while((current_frame = cam.GetFrame())) {
     cvResize(current_frame, small_img, CV_INTER_LINEAR);
@@ -69,6 +69,9 @@ int main(int argc, char **argv) {
     cvEqualizeHist(gray,gray);
     
     if(track) {
+      // tmp
+      f = detector.ColdStart(gray);
+      
       detector.TrackFeatures(gray, f, model, theta);
     } else {
       f = detector.ColdStart(gray);
