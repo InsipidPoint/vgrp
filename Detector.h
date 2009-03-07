@@ -32,6 +32,7 @@ private:
 	void FindEyebrowEnds(IplImage *face_img, Features& features);
 	
   void FitModel(Features& features, double model[9][3], double theta[3]);
+  void FindFaceCenter(Features& features);
   
   CvMemStorage* storage;
   CvHaarClassifierCascade* cascade;
