@@ -12,6 +12,8 @@ typedef struct _features {
   CvPoint nose_bridge;
   CvPoint pupils[2];
   CvPoint eyebrow_ends[2];
+  double horiz_slope;
+  double vert_slope;
 } Features;
 
 class Detector {

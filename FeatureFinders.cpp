@@ -445,3 +445,132 @@ void Detector::FindEyebrowEnds(IplImage *img, Features& features) {
 	return;
 	
 }
+
+void Detector::FindFaceCenter(Features& features) {
+  CvPoint centers[4];
+  double slopes[3];
+  double angles[3];
+
+  centers[0].x = (features.nostril_positions[0].x+features.nostril_positions[1].x)/2.0;
+  centers[0].y = (features.nostril_positions[0].y+features.nostril_positions[1].y)/2.0;
+
+  centers[1].x = (features.lip_positions[0].x+features.lip_positions[1].x)/2.0;
+  centers[1].y = (features.lip_positions[0].y+features.lip_positions[1].y)/2.0;
+
+  centers[2].x = (features.pupils[0].x+features.pupils[1].x)/2.0;
+  centers[2].y = (features.pupils[0].y+features.pupils[1].y)/2.0;
+
+  centers[3].x = features.nose_bridge.x;
+  centers[3].y = features.nose_bridge.y;
+
+  slopes[0] = double(features.nostril_positions[0].y-features.nostril_positions[1].y)/double(features.nostril_positions[1].x-features.nostril_positions[0].x);
+
+  slopes[1] = double(features.lip_positions[0].y-features.lip_positions[1].y)/double(features.lip_positions[1].x-features.lip_positions[0].x);
+
+  slopes[2] = double(features.pupils[0].y-features.pupils[1].y)/double(features.pupils[1].x-features.pupils[0].x);
+
+  angles[0] = atan(slopes[0]);
+  angles[1] = atan(slopes[1]);
+  angles[2] = atan(slopes[2]);
+  
+  int counts[3];
+  int maxCount = 0, maxIndex = 0;
+  for (int i = 0; i < 3; i++) {
+    counts[i] = 0;
+    for (int j = 0; j < 3; j++) {
+      if (i != j && fabs(angles[i]-angles[j]) < 0.1) {
+        counts[i]++;
+      }
+    }
+    if (counts[i] > maxCount) {
+      maxIndex = i;
+      maxCount = counts[i];
+    }
+  }
+
+  double horiz_ang = angles[maxIndex];
+  features.horiz_slope = slopes[maxIndex];
+//  std::cout << "horz ang: " << horiz_ang << std::endl;
+//  std::cout << "nostrils: " << angles[0] << std::endl;
+//  std::cout << "mouth: " << angles[1] << std::endl;
+//  std::cout << "eyes: " << angles[2] << std::endl;
+
+
+  double slopes2[5];
+  double angles2[5];
+
+  double denom = double(centers[1].x-centers[0].x);
+  if (denom != 0) {
+    slopes2[0] = double(centers[0].y-centers[1].y)/denom;
+  } else {
+    slopes2[0] = 11;
+  }
+  slopes2[0] = denom/double(centers[0].y-centers[1].y);
+
+  denom = double(centers[2].x-centers[0].x);
+  if (denom != 0) {
+    slopes2[1] = double(centers[0].y-centers[2].y)/denom;
+  } else {
+    slopes2[1] = 11;
+  }
+  slopes2[1] = denom/double(centers[0].y-centers[2].y);
+
+  denom = double(centers[3].x-centers[0].x);
+  if (denom != 0) {
+    slopes2[2] = double(centers[0].y-centers[3].y)/denom;
+  } else {
+    slopes2[2] = 11;
+  }
+  slopes2[2] = denom/double(centers[0].y-centers[3].y);
+
+  denom = double(centers[2].x-centers[1].x);
+  if (denom != 0) {
+    slopes2[3] = double(centers[1].y-centers[2].y)/denom;
+  } else {
+    slopes2[3] = 11;
+  }
+  slopes2[3] = denom/double(centers[1].y-centers[2].y);
+
+  denom = double(centers[3].x-centers[1].x);
+  if (denom != 0) {
+    slopes2[4] = double(centers[1].y-centers[3].y)/denom;
+  } else {
+    slopes2[4] = 11;
+  }
+  slopes2[4] = denom/double(centers[1].y-centers[3].y);
+
+
+  angles2[0] = atan(slopes2[0]);
+  angles2[1] = atan(slopes2[1]);
+  angles2[2] = atan(slopes2[2]);
+  angles2[3] = atan(slopes2[3]);
+  angles2[4] = atan(slopes2[4]);
+
+  int counts2[5];
+  maxCount = 0, maxIndex = 0;
+  for (int i = 0; i < 5; i++) {
+    counts2[i] = 0;
+    for (int j = 0; j < 5; j++) {
+      if (i != j && fabs(angles2[i]-angles2[j]) < 0.1) {
+        counts2[i]++;
+      }
+    }
+    if (counts2[i] > maxCount) {
+      maxIndex = i;
+      maxCount = counts2[i];
+    }
+  }
+
+  double vert_ang = angles2[maxIndex];
+  features.vert_slope = slopes2[maxIndex];
+//  std::cout << "vert ang: " << vert_ang << std::endl;
+//  std::cout << "1: " << angles2[0] << std::endl;
+//  std::cout << "2: " << angles2[1] << std::endl;
+//  std::cout << "3: " << angles2[2] << std::endl;
+//  std::cout << "4: " << angles2[3] << std::endl;
+//  std::cout << "5: " << angles2[4] << std::endl;
+//  std::cout << "#####" << std::endl;
+
+}
+
+
