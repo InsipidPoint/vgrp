@@ -28,8 +28,10 @@ Features Detector::ColdStart(IplImage *img) {
   return features;
 }
 
-void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][3], double theta[3]) {  
-  	grey = cvCloneImage(img);
+void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][3], double theta[3]) {
+  printf("%d %d %d ***\n",features.eyebrow_ends[1].x,features.eyebrow_ends[1].y, features.face_size);
+  
+  grey = cvCloneImage(img);
 	cvCalcOpticalFlowPyrLK( prev_grey, grey, prev_pyramid, pyramid,
 						   points[0], points[1], count, cvSize(win_size,win_size), 3, status, 0,
 						   cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03), flags );
@@ -58,7 +60,7 @@ void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][
 	features.eyebrow_ends[0] = cvPointFrom32f(points[0][7]);
 	features.eyebrow_ends[1] = cvPointFrom32f(points[0][8]);
 	
-	FitModel(features, model, theta);
+//	FitModel(features, model, theta);
 }
 
 void Detector::SetupTracking(IplImage *img, Features& features) {	
@@ -85,7 +87,6 @@ void Detector::SetupTracking(IplImage *img, Features& features) {
 	points[0][7] =  cvPointTo32f(features.eyebrow_ends[0]);
 	points[0][8] =  cvPointTo32f(features.eyebrow_ends[1]);
 	count=9;
+	
+	printf("%d %d %d **\n",features.eyebrow_ends[1].x,features.eyebrow_ends[1].y, features.face_size);
 }
-
-
-

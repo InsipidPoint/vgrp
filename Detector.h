@@ -47,6 +47,4 @@ private:
 	char* status;
 	int count;
 	int flags;
-	
-	
 };

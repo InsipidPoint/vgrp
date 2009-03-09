@@ -17,12 +17,9 @@ void DrawFace(IplImage *img, Features &f) {
       {{255,0,255}}
   };
   
-  CvPoint center;
   int radius;
-  center.x = cvRound(f.face_position.x + 0.5*f.face_size);
-  center.y = cvRound(f.face_position.y + 0.5*f.face_size);
   radius = cvRound(f.face_size*0.5);
-  cvCircle( img, center, radius, colors[0], 3, 8, 0 ); // draw face
+  cvCircle( img, f.face_position, radius, colors[0], 3, 8, 0 ); // draw face
   
   // draw lips
   cvCircle(img, cvPoint(f.lip_positions[0].x,f.lip_positions[0].y), 1, colors[1], 3, 8, 0);
@@ -42,6 +39,8 @@ void DrawFace(IplImage *img, Features &f) {
 	// draw eyebrow ends
 	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[4], 3, 8, 0);
 	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[4], 3, 8, 0);
+	
+	printf("%d %d %d $$$$\n",f.eyebrow_ends[1].x,f.eyebrow_ends[1].y, f.face_size);
 	
 }
 
@@ -70,12 +69,11 @@ int main(int argc, char **argv) {
     
     if(track) {
       // tmp
-      f = detector.ColdStart(gray);
+//      f = detector.ColdStart(gray);
       
       detector.TrackFeatures(gray, f, model, theta);
     } else {
       f = detector.ColdStart(gray);
-      detector.GetModel(f, model);
     }
     
     if(f.face_size) {
@@ -84,8 +82,9 @@ int main(int argc, char **argv) {
 
     cvShowImage(WINDOW_NAME, small_img);
 	  if(cvWaitKey(10) == 't') {
-		  printf("Here\n");
+	    printf("%d %d %d *\n",f.eyebrow_ends[1].x,f.eyebrow_ends[1].y, f.face_size);
 		  track = true;
+		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
 	  }
   }
