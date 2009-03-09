@@ -77,7 +77,7 @@ int compare(const void * a, const void * b) {
   return int(*(double*)a - *(double*)b);
 }
 
-#define RANGE 0.4
+#define RANGE 0.3
 void Detector::FitModel(Features& features, double model[9][3], double theta[3]) {
   double observed[9][3], best_fit[9][3], new_theta[3], scores[9], new_center[2];
   double min_val = 9999999;
@@ -86,9 +86,9 @@ void Detector::FitModel(Features& features, double model[9][3], double theta[3])
   double center_x = features.face_position.x;
   double center_y = features.face_position.y;
   
-  for(double tx = theta[0]-RANGE; tx <= theta[0]+RANGE; tx += 0.15) {
-    for(double ty = theta[1]-RANGE; ty <= theta[1]+RANGE; ty += 0.15) {
-      for(double tz = theta[2]-RANGE; tz <= theta[2]+RANGE; tz += 0.15) {
+  for(double tx = theta[0]-RANGE; tx <= theta[0]+RANGE; tx += 0.1) {
+    for(double ty = theta[1]-RANGE; ty <= theta[1]+RANGE; ty += 0.1) {
+      for(double tz = theta[2]-RANGE; tz <= theta[2]+RANGE; tz += 0.1) {
         for(double cx = -10; cx <= 10; cx+=2) {
           for(double cy = -10; cy <= 10; cy+=2) {
             double model_copy[9][3], score;
@@ -97,18 +97,15 @@ void Detector::FitModel(Features& features, double model[9][3], double theta[3])
               rot_x(tx,model_copy[i]);
               rot_y(ty,model_copy[i]);
               rot_z(tz,model_copy[i]);
-              scores[i] = abs(observed[i][0]-cx - model_copy[i][0]) + abs(observed[i][1]-cy - model_copy[i][1]);
-              printf("score[%d] = %f o:%f m:%f\n",i,scores[i],observed[i][0]-cx,model_copy[i][0]);
+              scores[i] = pow(observed[i][0]-cx - model_copy[i][0],2) + pow(observed[i][1]-cy - model_copy[i][1],2);
+    //          printf("score[%d] = %f o:%f m:%f\n",i,scores[i],observed[i][0]-cx,model_copy[i][0]);
             }
             qsort(scores, 9, sizeof(double), compare);
             
-            for(int i = 0; i < 9; i++) {
-              printf("%f ", scores[i]);
-            }
-            printf("%f \n", features.eyebrow_ends[1].x);
-            
             score = scores[0]+scores[1]+scores[2]+scores[3];
             if(min_val > score) {
+//              printf("%f \n", score);         
+              
               min_val = score;
               new_theta[0] = tx;
               new_theta[1] = ty;
@@ -123,7 +120,7 @@ void Detector::FitModel(Features& features, double model[9][3], double theta[3])
     }   
   }
   
-  //printf("%f %f %f\n", new_theta[0], new_theta[1], new_theta[2]);
+  printf("%f %f %f\n", new_theta[0], new_theta[1], new_theta[2]);
   theta[0] = new_theta[0];
   theta[1] = new_theta[1];
   theta[2] = new_theta[2];

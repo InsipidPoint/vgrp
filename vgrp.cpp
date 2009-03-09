@@ -39,9 +39,6 @@ void DrawFace(IplImage *img, Features &f) {
 	// draw eyebrow ends
 	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[4], 3, 8, 0);
 	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[4], 3, 8, 0);
-	
-	printf("%d %d %d $$$$\n",f.eyebrow_ends[1].x,f.eyebrow_ends[1].y, f.face_size);
-	
 }
 
 int main(int argc, char **argv) {
@@ -82,7 +79,6 @@ int main(int argc, char **argv) {
 
     cvShowImage(WINDOW_NAME, small_img);
 	  if(cvWaitKey(10) == 't') {
-	    printf("%d %d %d *\n",f.eyebrow_ends[1].x,f.eyebrow_ends[1].y, f.face_size);
 		  track = true;
 		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
