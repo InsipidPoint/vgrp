@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
 
   CvVideoWriter* vid_writer;
   if (output_flag) {
-    vid_writer = cvCreateVideoWriter(OUTPUT_FILE, CV_FOURCC('M', 'J', 'P', 'G'), 20,  cvSize(640, 480));
+    vid_writer = cvCreateVideoWriter(OUTPUT_FILE, CV_FOURCC('P', 'I', 'M', '1'), 25,  cvSize(640, 480));
   }
   
   while((current_frame = cam.GetFrame())) {
@@ -156,19 +156,15 @@ int main(int argc, char **argv) {
 		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
 	  }
-<<<<<<< HEAD:vgrp.cpp
 
     if (output_flag) {
       cvWriteFrame(vid_writer, small_img);
     }
-=======
 	  
 	  if((fabs(detector.speed[0]) > 2 && fabs(detector.speed[1]) > 2)) {
 		  docoldstart = true;  
 	  }
-	  
 	  docoldstart = false;
->>>>>>> 5a6624e37bb7070a11cf210ff042c5c9058659cb:vgrp.cpp
   }
   
   cvReleaseImage( &gray );
