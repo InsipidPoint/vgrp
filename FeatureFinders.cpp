@@ -11,6 +11,7 @@ void Detector::FindFace(IplImage *img, Features& features) {
       CvRect* r = (CvRect*)cvGetSeqElem(faces, 0);
       features.face_size = r->width;
       features.face_position = cvPoint(r->x+0.5*r->width,r->y+0.5*r->width);
+      features.theta = 0;
   } else {
     features.face_size = 0;
   }
@@ -380,7 +381,7 @@ void Detector::FindEyebrowEnds(IplImage *img, Features& features) {
 	int rightx = max(0,leftx + 7*(xmax + image->width/5 - leftx)/8);
 	int righty = max(0,image->height/4);
 	int righth =  max(ymin - image->height/20 - image->height/4,image->height/20);
-	int rightw = min((xmax + image->width/5 - rightx)/8,image->width-rightx);
+	int rightw = min((xmax + image->width/5 - leftx)/8,image->width-rightx);
 	if(rightw==0) {
 		if(rightx>0) {
 			rightx--;
@@ -440,6 +441,11 @@ void Detector::FindEyebrowEnds(IplImage *img, Features& features) {
 	features.eyebrow_ends[1].x = a2+tlx;
 	features.eyebrow_ends[1].y = b2+tly;
 
+//	if(a2<0 || b2<0) {
+//		printf("%d %d %d %d\n", rightx, righty, rightw, righth);	
+//	}
+//	printf("%d %d\n", a2,a2);
+	
 	cvResetImageROI(img);
 	
 	return;
@@ -488,8 +494,8 @@ void Detector::FindFaceCenter(Features& features) {
     }
   }
 
-  double horiz_ang = angles[maxIndex];
-  features.horiz_slope = slopes[maxIndex];
+//  double horiz_ang = angles[maxIndex];
+//  features.horiz_slope = slopes[maxIndex];
 //  std::cout << "horz ang: " << horiz_ang << std::endl;
 //  std::cout << "nostrils: " << angles[0] << std::endl;
 //  std::cout << "mouth: " << angles[1] << std::endl;
@@ -534,8 +540,8 @@ void Detector::FindFaceCenter(Features& features) {
     }
   }
 
-  double vert_ang = angles2[maxIndex];
-  features.vert_slope = slopes2[maxIndex];
+//  double vert_ang = angles2[maxIndex];
+//  features.vert_slope = slopes2[maxIndex];
 //  std::cout << "vert ang: " << vert_ang << std::endl;
 //  std::cout << "1: " << angles2[0] << std::endl;
 //  std::cout << "2: " << angles2[1] << std::endl;

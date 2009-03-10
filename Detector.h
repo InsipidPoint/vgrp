@@ -12,6 +12,7 @@ typedef struct _features {
   CvPoint nose_bridge;
   CvPoint pupils[2];
   CvPoint eyebrow_ends[2];
+
   double horiz_slope;
   double vert_slope;
   double horiz_lengths[2];
@@ -20,6 +21,8 @@ typedef struct _features {
   double vert_rotation;
   double past_horiz_rotations[5];
   double past_vert_rotations[5];
+
+  double theta;
 } Features;
 
 class Detector {
@@ -28,11 +31,12 @@ public:
   ~Detector();
   
   Features ColdStart(IplImage *img);
-  void TrackFeatures(IplImage *img, Features& features, double model[9][3], double theta[3]);
+  void TrackFeatures(IplImage *img, Features& features, double model[9][3]);
 	void SetupTracking(IplImage *img, Features& features);
   void GetModel(Features& features, double model[9][3]);
+	void FitGlasses(IplImage *img, Features& features, double model[9][3]);
   // move to private later
-  void FitModel(Features& features, double model[9][3], double theta[3]);
+  void FitModel(Features& features, double model[9][3]);
 private:
   void FindFace(IplImage *img, Features& features);
   void FindLips(IplImage *face_img, Features& features);
