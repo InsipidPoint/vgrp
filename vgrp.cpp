@@ -110,8 +110,8 @@ int main(int argc, char **argv) {
 
   CvVideoWriter* vid_writer;
   if (output_flag) {
-    vid_writer = cvCreateVideoWriter(OUTPUT_FILE, CV_FOURCC('P', 'I', 'M', '1'), 25,  cvSize(640, 480));
-  }
+    vid_writer = cvCreateVideoWriter(OUTPUT_FILE, CV_FOURCC('D', 'I', 'V', 'X'), 25,  cvSize(640, 480), 1);
+}
   
   while((current_frame = cam.GetFrame())) {
     cvResize(current_frame, small_img, CV_INTER_LINEAR);
@@ -157,6 +157,10 @@ int main(int argc, char **argv) {
 		  detector.SetupTracking(gray,f);
 	  }
 
+	  if(key == 'q') {
+      break;
+	  }
+
     if (output_flag) {
       cvWriteFrame(vid_writer, small_img);
     }
@@ -167,6 +171,8 @@ int main(int argc, char **argv) {
 	  docoldstart = false;
   }
   
+  if(output_flag)
+    cvReleaseVideoWriter(&vid_writer);
   cvReleaseImage( &gray );
   cvReleaseImage( &small_img );
   return 0;
