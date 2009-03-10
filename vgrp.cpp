@@ -42,15 +42,17 @@ void DrawFace(IplImage *img, Features &f, bool col = true) {
   	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[4], 3, 8, 0);
   	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[4], 3, 8, 0);
   } else {    
-//    cvCircle( img, f.face_position, radius, colors[0], 3, 8, 0 ); // draw face
-
     // draw lips
     cvCircle(img, cvPoint(f.lip_positions[0].x,f.lip_positions[0].y), 1, colors[5], 3, 8, 0);
     cvCircle(img, cvPoint(f.lip_positions[1].x,f.lip_positions[1].y), 1, colors[5], 3, 8, 0);
+    cvLine(img, cvPoint(f.lip_positions[0].x,f.lip_positions[0].y), cvPoint(f.nostril_positions[0].x,f.nostril_positions[0].y), colors[5], 1);
+    cvLine(img, cvPoint(f.lip_positions[1].x,f.lip_positions[1].y), cvPoint(f.nostril_positions[1].x,f.nostril_positions[1].y), colors[5], 1);
 
   	// draw nostrils
   	cvCircle(img, cvPoint(f.nostril_positions[0].x,f.nostril_positions[0].y), 1, colors[5], 3, 8, 0);
   	cvCircle(img, cvPoint(f.nostril_positions[1].x,f.nostril_positions[1].y), 1, colors[5], 3, 8, 0);
+  	cvLine(img, cvPoint(f.nostril_positions[0].x,f.nostril_positions[0].y), cvPoint(f.nose_bridge.x,f.nose_bridge.y), colors[5], 1);
+  	cvLine(img, cvPoint(f.nostril_positions[1].x,f.nostril_positions[1].y), cvPoint(f.nose_bridge.x,f.nose_bridge.y), colors[5], 1);
 
   	// draw nose bridge
   	cvCircle(img, cvPoint(f.nose_bridge.x,f.nose_bridge.y), 1, colors[5], 3, 8, 0);
@@ -58,10 +60,14 @@ void DrawFace(IplImage *img, Features &f, bool col = true) {
   	// draw pupils
   	cvCircle(img, cvPoint(f.pupils[0].x,f.pupils[0].y), 1, colors[5], 3, 8, 0);
   	cvCircle(img, cvPoint(f.pupils[1].x,f.pupils[1].y), 1, colors[5], 3, 8, 0);
+  	cvLine(img, cvPoint(f.pupils[0].x,f.pupils[0].y), cvPoint(f.nose_bridge.x,f.nose_bridge.y), colors[5], 1);
+  	cvLine(img, cvPoint(f.pupils[1].x,f.pupils[1].y), cvPoint(f.nose_bridge.x,f.nose_bridge.y), colors[5], 1);
 
   	// draw eyebrow ends
   	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[5], 3, 8, 0);
   	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[5], 3, 8, 0);
+  	cvLine(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), cvPoint(f.pupils[0].x,f.pupils[0].y), colors[5], 1);
+  	cvLine(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), cvPoint(f.pupils[1].x,f.pupils[1].y), colors[5], 1);
   }
 }
 
@@ -96,7 +102,7 @@ int main(int argc, char **argv) {
   IplImage *small_img = cvCreateImage(cvSize(640,480), 8, 3);
   Camera cam(filename);
   Detector detector;
-  Features f;
+  Features f,mf;
   bool track = false, docoldstart=false;
   double model[9][3];
   
@@ -104,13 +110,13 @@ int main(int argc, char **argv) {
     cvResize(current_frame, small_img, CV_INTER_LINEAR);
     cvFlip(small_img, small_img, 1);
     cvCvtColor(small_img, gray, CV_BGR2GRAY);
-    cvEqualizeHist(gray,gray);
+//    cvEqualizeHist(gray,gray);
     
     if(track) {
       detector.TrackFeatures(gray, f, model);
-//      DrawFace(small_img, f, false);
-      detector.FitModel(f, model);
-		detector.FitGlasses(gray,f,model);
+      detector.FitModel(f, model, &mf);
+      DrawFace(small_img, mf, false);
+		  detector.FitGlasses(gray,f,model);
       CvFont font;
       double hScale=0.5;
       double vScale=0.5;
@@ -148,7 +154,7 @@ int main(int argc, char **argv) {
 		  docoldstart = true;  
 	  }
 	  
-//	  docoldstart = false;
+	  docoldstart = false;
   }
   
   cvReleaseImage( &gray );
