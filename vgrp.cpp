@@ -4,7 +4,7 @@
 
 const char *WINDOW_NAME = "Display Window";
 
-void DrawFace(IplImage *img, Features &f) {
+void DrawFace(IplImage *img, Features &f, bool col = true) {
   static CvScalar colors[] = 
   {
       {{0,0,255}},
@@ -19,26 +19,50 @@ void DrawFace(IplImage *img, Features &f) {
   
   int radius;
   radius = cvRound(f.face_size*0.5);
-  cvCircle( img, f.face_position, radius, colors[0], 3, 8, 0 ); // draw face
   
-  // draw lips
-  cvCircle(img, cvPoint(f.lip_positions[0].x,f.lip_positions[0].y), 1, colors[1], 3, 8, 0);
-  cvCircle(img, cvPoint(f.lip_positions[1].x,f.lip_positions[1].y), 1, colors[1], 3, 8, 0);
-  
-	// draw nostrils
-	cvCircle(img, cvPoint(f.nostril_positions[0].x,f.nostril_positions[0].y), 1, colors[0], 3, 8, 0);
-	cvCircle(img, cvPoint(f.nostril_positions[1].x,f.nostril_positions[1].y), 1, colors[0], 3, 8, 0);
-	
-	// draw nose bridge
-	cvCircle(img, cvPoint(f.nose_bridge.x,f.nose_bridge.y), 1, colors[2], 3, 8, 0);
+  if(col) {
+    cvCircle( img, f.face_position, radius, colors[0], 3, 8, 0 ); // draw face
 
-	// draw pupils
-	cvCircle(img, cvPoint(f.pupils[0].x,f.pupils[0].y), 1, colors[3], 3, 8, 0);
-	cvCircle(img, cvPoint(f.pupils[1].x,f.pupils[1].y), 1, colors[3], 3, 8, 0);
+    // draw lips
+    cvCircle(img, cvPoint(f.lip_positions[0].x,f.lip_positions[0].y), 1, colors[1], 3, 8, 0);
+    cvCircle(img, cvPoint(f.lip_positions[1].x,f.lip_positions[1].y), 1, colors[1], 3, 8, 0);
 
-	// draw eyebrow ends
-	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[4], 3, 8, 0);
-	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[4], 3, 8, 0);
+  	// draw nostrils
+  	cvCircle(img, cvPoint(f.nostril_positions[0].x,f.nostril_positions[0].y), 1, colors[0], 3, 8, 0);
+  	cvCircle(img, cvPoint(f.nostril_positions[1].x,f.nostril_positions[1].y), 1, colors[0], 3, 8, 0);
+
+  	// draw nose bridge
+  	cvCircle(img, cvPoint(f.nose_bridge.x,f.nose_bridge.y), 1, colors[2], 3, 8, 0);
+
+  	// draw pupils
+  	cvCircle(img, cvPoint(f.pupils[0].x,f.pupils[0].y), 1, colors[3], 3, 8, 0);
+  	cvCircle(img, cvPoint(f.pupils[1].x,f.pupils[1].y), 1, colors[3], 3, 8, 0);
+
+  	// draw eyebrow ends
+  	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[4], 3, 8, 0);
+  	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[4], 3, 8, 0);
+  } else {    
+//    cvCircle( img, f.face_position, radius, colors[0], 3, 8, 0 ); // draw face
+
+    // draw lips
+    cvCircle(img, cvPoint(f.lip_positions[0].x,f.lip_positions[0].y), 1, colors[5], 3, 8, 0);
+    cvCircle(img, cvPoint(f.lip_positions[1].x,f.lip_positions[1].y), 1, colors[5], 3, 8, 0);
+
+  	// draw nostrils
+  	cvCircle(img, cvPoint(f.nostril_positions[0].x,f.nostril_positions[0].y), 1, colors[5], 3, 8, 0);
+  	cvCircle(img, cvPoint(f.nostril_positions[1].x,f.nostril_positions[1].y), 1, colors[5], 3, 8, 0);
+
+  	// draw nose bridge
+  	cvCircle(img, cvPoint(f.nose_bridge.x,f.nose_bridge.y), 1, colors[5], 3, 8, 0);
+
+  	// draw pupils
+  	cvCircle(img, cvPoint(f.pupils[0].x,f.pupils[0].y), 1, colors[5], 3, 8, 0);
+  	cvCircle(img, cvPoint(f.pupils[1].x,f.pupils[1].y), 1, colors[5], 3, 8, 0);
+
+  	// draw eyebrow ends
+  	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[5], 3, 8, 0);
+  	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[5], 3, 8, 0);
+  }
 }
 
 int main(int argc, char **argv) {
@@ -69,6 +93,17 @@ int main(int argc, char **argv) {
 //      f = detector.ColdStart(gray);
       
       detector.TrackFeatures(gray, f, model, theta);
+      DrawFace(small_img, f, false);
+      detector.FitModel(f, model, theta);
+      
+      CvFont font;
+      double hScale=0.5;
+      double vScale=0.5;
+      int    lineWidth=1;
+      cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX, hScale,vScale,0,lineWidth);
+      char buf[100];
+      sprintf(buf,"t1:%f t2:%f t3:%f",theta[0],theta[1],theta[2]);
+      cvPutText (small_img,buf,cvPoint(200,400), &font, cvScalar(255,255,0));
     } else {
       f = detector.ColdStart(gray);
     }
