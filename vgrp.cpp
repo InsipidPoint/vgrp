@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
   Camera cam(filename);
   Detector detector;
   Features f;
-  bool track = false;
+  bool track = false, docoldstart=false;
   double model[9][3];
   
   while((current_frame = cam.GetFrame())) {
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
     
     if(track) {
       detector.TrackFeatures(gray, f, model);
-      DrawFace(small_img, f, false);
+//      DrawFace(small_img, f, false);
       detector.FitModel(f, model);
 		detector.FitGlasses(gray,f,model);
       CvFont font;
@@ -135,11 +135,16 @@ int main(int argc, char **argv) {
 		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
 	  }
-	  if(key == 'a') {
+	  if(key == 'a' || (f.theta < 0.1 && docoldstart)) {
 		  f = detector.ColdStart(gray);
 		  track = true;
+		  docoldstart = false;
 		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
+	  }
+	  
+	  if((fabs(detector.speed[0]) > 1 && fabs(detector.speed[1]) > 1)) {
+		  docoldstart = true;  
 	  }
   }
   

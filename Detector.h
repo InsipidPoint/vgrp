@@ -37,6 +37,9 @@ public:
 	void FitGlasses(IplImage *img, Features& features, double model[9][3]);
   // move to private later
   void FitModel(Features& features, double model[9][3]);
+	
+	double speed[2];
+
 private:
   void FindFace(IplImage *img, Features& features);
   void FindLips(IplImage *face_img, Features& features);
@@ -61,6 +64,5 @@ private:
 	int count;
 	int flags;
 	
-	double speed[2];
 	CvPoint* glasses[3];
 };

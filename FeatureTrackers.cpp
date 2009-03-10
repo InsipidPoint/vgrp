@@ -119,7 +119,7 @@ void Detector::FitModel(Features& features, double model[9][3]) {
   
   features.face_position.x = new_center[0];
   features.face_position.y = new_center[1];
-//  return;
+return;
 //remove
   features.nostril_positions[0].x = best_fit[0][0] + new_center[0];
   features.nostril_positions[0].y = best_fit[0][1] + new_center[1];
