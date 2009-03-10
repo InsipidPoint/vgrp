@@ -87,7 +87,7 @@ void Detector::FitModel(Features& features, double model[9][3]) {
   double center_y = features.face_position.y;
   double min_z;
   
-  for(double tz = features.theta-RANGE; tz <= features.theta+RANGE; tz += 0.05) {
+  for(double tz = features.theta-RANGE; tz <= features.theta+RANGE; tz += 0.025) {
     for(double cx = -30; cx <= 30; cx+=3) {
       for(double cy = -30; cy <= 30; cy+=3) {
 //      for(double z = 0.8; z <= 1.2; z+=0.1) {
@@ -100,7 +100,7 @@ void Detector::FitModel(Features& features, double model[9][3]) {
           }
           qsort(scores, 9, sizeof(double), compare);
 
-          score = scores[0]+scores[1]+scores[2]+scores[3]+scores[4];
+          score = scores[0]+scores[1]+scores[2]+scores[3]+scores[4]+scores[5];
           if(min_val > score) {              
             min_val = score;
             new_theta = tz;
@@ -120,7 +120,7 @@ void Detector::FitModel(Features& features, double model[9][3]) {
   
   features.face_position.x = new_center[0];
   features.face_position.y = new_center[1];
-  return;
+//  return;
 //remove
   features.nostril_positions[0].x = best_fit[0][0] + new_center[0];
   features.nostril_positions[0].y = best_fit[0][1] + new_center[1];
