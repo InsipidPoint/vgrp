@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
     
     if(track) {
       detector.TrackFeatures(gray, f, model);
-//      DrawFace(small_img, f, false);
+      DrawFace(small_img, f, false);
       detector.FitModel(f, model);
 		detector.FitGlasses(gray,f,model);
       CvFont font;
