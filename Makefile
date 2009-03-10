@@ -7,7 +7,7 @@ SUFFIX = $(firstword $(suffix $(SRC)))
 OBJ = $(SRC:$(SUFFIX)=.o)
 
 all:
-	$(CC) $(CCMACFLAGS) $(SRC) -o vgrp $(LIBS)
+	$(CC) $(CCMACFLAGS) $(SRC) -O3 -o vgrp $(LIBS)
   
 clean:
 	rm -f *.o core vgrp
