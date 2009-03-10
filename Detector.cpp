@@ -97,17 +97,17 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3],
 	//UD = +-theta[1]
 	//L/R rotate = +-theta[2]
 	IplImage *out = cvCloneImage(img);
-	CvPoint face_center;
-	face_center.x = (features.nostril_positions[0].x + features.nostril_positions[1].x)/2;
-	face_center.y = (features.nostril_positions[0].y + features.nostril_positions[1].y)/2;
+	CvPoint face_center = features.face_position;
+//	face_center.x = (features.nostril_positions[0].x + features.nostril_positions[1].x)/2;
+//	face_center.y = (features.nostril_positions[0].y + features.nostril_positions[1].y)/2;
 	double delta[3] = {0.35,0.18,0.07};
 	double w = delta[0]*features.face_size;
 	double h = delta[1]*features.face_size;
 	double l = delta[2]*features.face_size;
 	std::cout<<features.horiz_slope<<std::endl;
-	double scale1[2] = {1/0.11,1/0.11};
-	//theta[0] = 1;
-	theta[0] = (cvSqrt((features.nostril_positions[0].x-features.nostril_positions[1].x)*(features.nostril_positions[0].x-features.nostril_positions[1].x) + (features.nostril_positions[0].y-features.nostril_positions[1].y)*(features.nostril_positions[0].y-features.nostril_positions[1].y)))/features.face_size;
+	double scale1[2] = {1,1};
+	theta[0] = 1;
+//	theta[0] = (cvSqrt((features.nostril_positions[0].x-features.nostril_positions[1].x)*(features.nostril_positions[0].x-features.nostril_positions[1].x) + (features.nostril_positions[0].y-features.nostril_positions[1].y)*(features.nostril_positions[0].y-features.nostril_positions[1].y)))/features.face_size;
 //	std::cout<<theta[0]<<std::endl;
 	CvMat *perspective_projection = cvCreateMat(3,3,CV_32FC1);
 	CvPoint nb;
@@ -135,14 +135,46 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3],
 	cvmSet(dst,1,3,scale1[0]*(features.eyebrow_ends[1].y+nb.y)/2+h);
 	cvFindHomography(src,dst,perspective_projection);
 	
-//	printf("%f\n",theta[0]);
-	cvRectangle(out, cvPoint(nb.x-scale1[1]*theta[0]*l-w,scale1[0]*theta[0]*(features.eyebrow_ends[0].y+nb.y)/2), cvPoint(nb.x-scale1[1]*theta[0]*l,(features.eyebrow_ends[0].y+nb.y)/2+h), cvScalar(0,0,255), 1, 8, 0);
-	cvRectangle(out, cvPoint(nb.x+scale1[0]*theta[0]*l,(features.eyebrow_ends[1].y+nb.y)/2), cvPoint(nb.x+scale1[0]*theta[0]*l+scale1[0]*theta[0]*w,scale1[1]*theta[0]*(features.eyebrow_ends[1].y+nb.y)/2+scale1[0]*theta[0]*h), cvScalar(0,0,255), 1, 8, 0);
-	cvLine(out,cvPoint(nb.x-scale1[1]*theta[0]*l,(features.eyebrow_ends[0].y+nb.y)/2+h/2),cvPoint(nb.x+scale1[0]*theta[0]*l,(features.eyebrow_ends[1].y+nb.y)/2+h/2), cvScalar(0,0,255), 1, 8, 0);
+//	nb.x -= face_center.x;
+//	nb.y -= face_center.y;
+//	
+//	features.eyebrow_ends[0].x -= face_center.x;
+//	features.eyebrow_ends[0].y -= face_center.y;
+//	features.eyebrow_ends[1].x -= face_center.x;
+//	features.eyebrow_ends[1].y -= face_center.y;
+//	
+//	nb.x *= cos(theta[2]);
+//	nb.y *= sin(theta[2]);
+//	features.eyebrow_ends[0].x *= cos(theta[2]);
+//	features.eyebrow_ends[0].y *= sin(theta[2]);
+//	features.eyebrow_ends[1].x *= cos(theta[2]);
+//	features.eyebrow_ends[1].y *= sin(theta[2]);
+//	
+//	CvPoint* points[2] = {0,0};
+//	points[0] = (CvPoint*)cvAlloc(4*sizeof(points[0][0]));
+//	points[1] = (CvPoint*)cvAlloc(4*sizeof(points[0][0]));
+//
+//	points[0][0] = cvPoint(nb.x-l-w,(features.eyebrow_ends[0].y+nb.y)/2);
+//	points[0][1] = cvPoint(nb.x-l,(features.eyebrow_ends[0].y+nb.y)/2);
+//	points[0][2] = cvPoint(nb.x-l,(features.eyebrow_ends[0].y+nb.y)/2+h);
+//	points[0][3] = cvPoint(nb.x-l-w,(features.eyebrow_ends[0].y+nb.y)/2+h);
+//	points[1][0] = cvPoint(nb.x+l,(features.eyebrow_ends[1].y+nb.y)/2);
+//	points[1][1] = cvPoint(nb.x+l+w,(features.eyebrow_ends[1].y+nb.y)/2);
+//	points[1][2] = cvPoint(nb.x+l+w,(features.eyebrow_ends[1].y+nb.y)/2+h);
+//	points[1][3] = cvPoint(nb.x+l,(features.eyebrow_ends[1].y+nb.y)/2+h);
 	
-	//	cvRectangle(out, cvPoint(nb.x-l-w,(features.eyebrow_ends[0].y+nb.y)/2), cvPoint(nb.x-l,(features.eyebrow_ends[0].y+nb.y)/2+h), cvScalar(0,0,255), 1, 8, 0);
-	//	cvRectangle(out, cvPoint(nb.x+l,(features.eyebrow_ends[1].y+nb.y)/2), cvPoint(nb.x+l+w,(features.eyebrow_ends[1].y+nb.y)/2+h), cvScalar(0,0,255), 1, 8, 0);
-	//	cvLine(out,cvPoint(nb.x-l,(features.eyebrow_ends[0].y+nb.y)/2+h/2),cvPoint(nb.x+l,(features.eyebrow_ends[1].y+nb.y)/2+h/2), cvScalar(0,0,255), 1, 8, 0);
+	
+	//	printf("%f\n",theta[0]);
+//	cvRectangle(out, cvPoint(nb.x-scale1[1]*theta[0]*l-w,scale1[0]*theta[0]*(features.eyebrow_ends[0].y+nb.y)/2), cvPoint(nb.x-scale1[1]*theta[0]*l,(features.eyebrow_ends[0].y+nb.y)/2+h), cvScalar(0,0,255), 1, 8, 0);
+//	cvRectangle(out, cvPoint(nb.x+scale1[0]*theta[0]*l,(features.eyebrow_ends[1].y+nb.y)/2), cvPoint(nb.x+scale1[0]*theta[0]*l+scale1[0]*theta[0]*w,scale1[1]*theta[0]*(features.eyebrow_ends[1].y+nb.y)/2+scale1[0]*theta[0]*h), cvScalar(0,0,255), 1, 8, 0);
+//	cvLine(out,cvPoint(nb.x-scale1[1]*theta[0]*l,(features.eyebrow_ends[0].y+nb.y)/2+h/2),cvPoint(nb.x+scale1[0]*theta[0]*l,(features.eyebrow_ends[1].y+nb.y)/2+h/2), cvScalar(0,0,255), 1, 8, 0);
+	
+	cvRectangle(out, cvPoint(nb.x-l-w,(features.eyebrow_ends[0].y+nb.y)/2), cvPoint(nb.x-l,(features.eyebrow_ends[0].y+nb.y)/2+h), cvScalar(0,0,255), 1, 8, 0);
+	cvRectangle(out, cvPoint(nb.x+l,(features.eyebrow_ends[1].y+nb.y)/2), cvPoint(nb.x+l+w,(features.eyebrow_ends[1].y+nb.y)/2+h), cvScalar(0,0,255), 1, 8, 0);
+	cvLine(out,cvPoint(nb.x-l,(features.eyebrow_ends[0].y+nb.y)/2+h/2),cvPoint(nb.x+l,(features.eyebrow_ends[1].y+nb.y)/2+h/2), cvScalar(0,0,255), 1, 8, 0);
+
+	cvCircle(out,cvPoint((nb.x+features.eyebrow_ends[0].x)/2,(nb.y+features.eyebrow_ends[0].y)/2),30,cvScalar(0,0,0),1,8,0);
+	cvCircle(out,cvPoint((nb.x+features.eyebrow_ends[1].x)/2,(nb.y+features.eyebrow_ends[1].y)/2),30,cvScalar(0,0,0),1,8,0);
 	
 	cvShowImage("result",out);
 	return;

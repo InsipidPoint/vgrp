@@ -96,9 +96,9 @@ int main(int argc, char **argv) {
       // tmp
 //      f = detector.ColdStart(gray);
       detector.TrackFeatures(gray, f, model, theta);
-      DrawFace(small_img, f, false);
+//      DrawFace(small_img, f, false);
       detector.FitModel(f, model, theta);
-      
+		detector.FitGlasses(gray,f,model,theta);
       CvFont font;
       double hScale=0.5;
       double vScale=0.5;
@@ -117,6 +117,12 @@ int main(int argc, char **argv) {
 
     cvShowImage(WINDOW_NAME, small_img);
 	  if(cvWaitKey(10) == 't') {
+		  track = true;
+		  detector.GetModel(f, model);
+		  detector.SetupTracking(gray,f);
+	  }
+	  if(cvWaitKey(10) == 'a') {
+		  if(theta[3]<0.1) f = detector.ColdStart(gray);
 		  track = true;
 		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
