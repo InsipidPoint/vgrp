@@ -62,6 +62,10 @@ void DrawFace(IplImage *img, Features &f, bool col = true) {
   	// draw eyebrow ends
   	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[5], 3, 8, 0);
   	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[5], 3, 8, 0);
+    
+    // draw axes
+    cvLine(img, cvPoint(f.face_position.x-50.0, f.face_position.y-(50.0*f.horiz_slope)), cvPoint(f.face_position.x+50.0, f.face_position.y+(50.0*f.horiz_slope)), colors[3], 1);
+    cvLine(img, cvPoint(f.face_position.x-(50.0*f.vert_slope), f.face_position.y-50.0), cvPoint(f.face_position.x+(50.0*f.vert_slope), f.face_position.y+50.0), colors[3], 1);
   }
 }
 
@@ -91,7 +95,6 @@ int main(int argc, char **argv) {
     if(track) {
       // tmp
 //      f = detector.ColdStart(gray);
-      
       detector.TrackFeatures(gray, f, model, theta);
       DrawFace(small_img, f, false);
       detector.FitModel(f, model, theta);

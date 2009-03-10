@@ -380,7 +380,7 @@ void Detector::FindEyebrowEnds(IplImage *img, Features& features) {
 	int rightx = max(0,leftx + 7*(xmax + image->width/5 - leftx)/8);
 	int righty = max(0,image->height/4);
 	int righth =  max(ymin - image->height/20 - image->height/4,image->height/20);
-	int rightw = min((xmax + image->width/5 - rightx)/8,image->width-rightx);
+	int rightw = min((xmax + image->width/5 - leftx)/8,image->width-rightx);
 	if(rightw==0) {
 		if(rightx>0) {
 			rightx--;
@@ -440,6 +440,11 @@ void Detector::FindEyebrowEnds(IplImage *img, Features& features) {
 	features.eyebrow_ends[1].x = a2+tlx;
 	features.eyebrow_ends[1].y = b2+tly;
 
+//	if(a2<0 || b2<0) {
+//		printf("%d %d %d %d\n", rightx, righty, rightw, righth);	
+//	}
+//	printf("%d %d\n", a2,a2);
+	
 	cvResetImageROI(img);
 	
 	return;
@@ -463,11 +468,11 @@ void Detector::FindFaceCenter(Features& features) {
   centers[3].x = features.nose_bridge.x;
   centers[3].y = features.nose_bridge.y;
 
-  slopes[0] = double(features.nostril_positions[0].y-features.nostril_positions[1].y)/double(features.nostril_positions[1].x-features.nostril_positions[0].x);
+  slopes[0] = double(features.nostril_positions[1].y-features.nostril_positions[0].y)/double(features.nostril_positions[1].x-features.nostril_positions[0].x);
 
-  slopes[1] = double(features.lip_positions[0].y-features.lip_positions[1].y)/double(features.lip_positions[1].x-features.lip_positions[0].x);
+  slopes[1] = double(features.lip_positions[1].y-features.lip_positions[0].y)/double(features.lip_positions[1].x-features.lip_positions[0].x);
 
-  slopes[2] = double(features.pupils[0].y-features.pupils[1].y)/double(features.pupils[1].x-features.pupils[0].x);
+  slopes[2] = double(features.pupils[1].y-features.pupils[0].y)/double(features.pupils[1].x-features.pupils[0].x);
 
   angles[0] = atan(slopes[0]);
   angles[1] = atan(slopes[1]);
@@ -499,45 +504,15 @@ void Detector::FindFaceCenter(Features& features) {
   double slopes2[5];
   double angles2[5];
 
-  double denom = double(centers[1].x-centers[0].x);
-  if (denom != 0) {
-    slopes2[0] = double(centers[0].y-centers[1].y)/denom;
-  } else {
-    slopes2[0] = 11;
-  }
-  slopes2[0] = denom/double(centers[0].y-centers[1].y);
+  slopes2[0] = double(centers[1].x-centers[0].x)/double(centers[1].y-centers[0].y);
 
-  denom = double(centers[2].x-centers[0].x);
-  if (denom != 0) {
-    slopes2[1] = double(centers[0].y-centers[2].y)/denom;
-  } else {
-    slopes2[1] = 11;
-  }
-  slopes2[1] = denom/double(centers[0].y-centers[2].y);
+  slopes2[1] = double(centers[2].x-centers[0].x)/double(centers[2].y-centers[0].y);
 
-  denom = double(centers[3].x-centers[0].x);
-  if (denom != 0) {
-    slopes2[2] = double(centers[0].y-centers[3].y)/denom;
-  } else {
-    slopes2[2] = 11;
-  }
-  slopes2[2] = denom/double(centers[0].y-centers[3].y);
+  slopes2[2] = double(centers[3].x-centers[0].x)/double(centers[3].y-centers[0].y);
 
-  denom = double(centers[2].x-centers[1].x);
-  if (denom != 0) {
-    slopes2[3] = double(centers[1].y-centers[2].y)/denom;
-  } else {
-    slopes2[3] = 11;
-  }
-  slopes2[3] = denom/double(centers[1].y-centers[2].y);
+  slopes2[3] = double(centers[2].x-centers[1].x)/double(centers[2].y-centers[1].y);
 
-  denom = double(centers[3].x-centers[1].x);
-  if (denom != 0) {
-    slopes2[4] = double(centers[1].y-centers[3].y)/denom;
-  } else {
-    slopes2[4] = 11;
-  }
-  slopes2[4] = denom/double(centers[1].y-centers[3].y);
+  slopes2[4] = double(centers[3].x-centers[1].x)/double(centers[3].y-centers[1].y);
 
 
   angles2[0] = atan(slopes2[0]);
