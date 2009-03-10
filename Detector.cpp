@@ -55,7 +55,7 @@ void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][
 	}
 	speed[0]/=9;
 	speed[1]/=9;
-	std::cout<<speed[0]<<" "<<speed[1]<<std::endl;
+//	std::cout<<speed[0]<<" "<<speed[1]<<std::endl;
 	
 	CV_SWAP( prev_grey, grey, swap_temp );
 	CV_SWAP( prev_pyramid, pyramid, swap_temp );
@@ -74,6 +74,7 @@ void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][
   FindFaceCenter(features);
   FindRotation(features);
 	
+	std::cout<<features.horiz_rotation<<" "<<features.vert_rotation<<std::endl;
 //	FitModel(features, model, theta);
 //	FitGlasses(img,features,model,theta);
 }
@@ -244,7 +245,18 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3])
 	
 //	cvCircle(out,cvPoint((nb.x+features.eyebrow_ends[0].x)/2,(nb.y+features.eyebrow_ends[0].y)/2),30,cvScalar(0,0,0),1,8,0);
 //	cvCircle(out,cvPoint((nb.x+features.eyebrow_ends[1].x)/2,(nb.y+features.eyebrow_ends[1].y)/2),30,cvScalar(0,0,0),1,8,0);
+
+	CvPoint center1;
+	center1.x = (new_glasses[0][0].x + new_glasses[0][1].x + new_glasses[0][2].x + new_glasses[0][3].x)/4;
+	center1.y = (new_glasses[0][0].y + new_glasses[0][1].y + new_glasses[0][2].y + new_glasses[0][3].y)/4;
+
+	CvPoint center2;
+	center2.x = (new_glasses[1][0].x + new_glasses[1][1].x + new_glasses[1][2].x + new_glasses[1][3].x)/4;
+	center2.y = (new_glasses[1][0].y + new_glasses[1][1].y + new_glasses[1][2].y + new_glasses[1][3].y)/4;
 	
+	cvCircle(out,cvPoint(nb.x+center1.x,nb.y+center1.y),30,cvScalar(0,0,0),4,8,0);
+	cvCircle(out,cvPoint(nb.x+center2.x,nb.y+center2.y),30,cvScalar(0,0,0),4,8,0);
+
 	cvShowImage("result",out);
 	return;
 }
