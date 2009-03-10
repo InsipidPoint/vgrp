@@ -253,8 +253,8 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3])
 	center2.x = (new_glasses[1][0].x + new_glasses[1][1].x + new_glasses[1][2].x + new_glasses[1][3].x)/4;
 	center2.y = (new_glasses[1][0].y + new_glasses[1][1].y + new_glasses[1][2].y + new_glasses[1][3].y)/4;
 	
-//	cvCircle(out,cvPoint(nb.x+center1.x,nb.y+center1.y),30,cvScalar(0,0,0),4,8,0);
-//	cvCircle(out,cvPoint(nb.x+center2.x,nb.y+center2.y),30,cvScalar(0,0,0),4,8,0);
+	cvCircle(out,cvPoint(nb.x+center1.x,nb.y+center1.y),30,cvScalar(0,0,0),4,8,0);
+	cvCircle(out,cvPoint(nb.x+center2.x,nb.y+center2.y),30,cvScalar(0,0,0),4,8,0);
 
 	cvShowImage("result",out);
 	return;
