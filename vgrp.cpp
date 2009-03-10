@@ -3,6 +3,8 @@
 #include <cstdio>
 
 const char *WINDOW_NAME = "Display Window";
+const char *OUTPUT_FILE = "output.avi";
+const bool output_flag = true;
 
 void DrawFace(IplImage *img, Features &f, bool col = true) {
   static CvScalar colors[] = 
@@ -99,6 +101,11 @@ int main(int argc, char **argv) {
   Features f;
   bool track = false;
   double model[9][3];
+
+  CvVideoWriter* vid_writer;
+  if (output_flag) {
+    vid_writer = cvCreateVideoWriter(OUTPUT_FILE, CV_FOURCC('M', 'J', 'P', 'G'), 20,  cvSize(640, 480));
+  }
   
   while((current_frame = cam.GetFrame())) {
     cvResize(current_frame, small_img, CV_INTER_LINEAR);
@@ -141,6 +148,10 @@ int main(int argc, char **argv) {
 		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
 	  }
+
+    if (output_flag) {
+      cvWriteFrame(vid_writer, small_img);
+    }
   }
   
   cvReleaseImage( &gray );
