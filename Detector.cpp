@@ -57,6 +57,8 @@ void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][
 	features.pupils[1] = cvPointFrom32f(points[0][6]);
 	features.eyebrow_ends[0] = cvPointFrom32f(points[0][7]);
 	features.eyebrow_ends[1] = cvPointFrom32f(points[0][8]);
+
+  FindFaceCenter(features);
 	
 //	FitModel(features, model, theta);
 }
