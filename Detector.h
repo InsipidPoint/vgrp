@@ -22,12 +22,12 @@ public:
   ~Detector();
   
   Features ColdStart(IplImage *img);
-  void TrackFeatures(IplImage *img, Features& features, double model[9][3], double theta[3]);
+  void TrackFeatures(IplImage *img, Features& features, double model[9][3], double& theta);
 	void SetupTracking(IplImage *img, Features& features);
   void GetModel(Features& features, double model[9][3]);
-	void FitGlasses(IplImage *img, Features& features, double model[9][3], double theta[3]);
+	void FitGlasses(IplImage *img, Features& features, double model[9][3], double theta);
   // move to private later
-  void FitModel(Features& features, double model[9][3], double theta[3]);
+  void FitModel(Features& features, double model[9][3], double& theta);
 private:
   void FindFace(IplImage *img, Features& features);
   void FindLips(IplImage *face_img, Features& features);
@@ -49,4 +49,7 @@ private:
 	char* status;
 	int count;
 	int flags;
+	
+	double speed[2];
+	CvPoint* glasses[3];
 };

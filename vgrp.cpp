@@ -69,6 +69,24 @@ void DrawFace(IplImage *img, Features &f, bool col = true) {
   }
 }
 
+void draw_cross(IplImage *img, Features& f, double theta) {
+  static CvScalar colors[] = 
+  {
+      {{0,0,255}},
+      {{0,128,255}},
+      {{0,255,255}},
+      {{0,255,0}},
+      {{255,128,0}},
+      {{255,255,0}},
+      {{255,0,0}},
+      {{255,0,255}}
+  };
+  
+  double phi = theta > 0 ? theta-1.57 : theta+1.57;
+  cvLine(img, cvPoint(f.face_position.x+50.0, f.face_position.y+(50.0*phi)), cvPoint(f.face_position.x-50.0, f.face_position.y-(50.0*phi)), colors[0], 1);
+  cvLine(img, cvPoint(f.face_position.x-(50.0*tan(theta)), f.face_position.y-50.0), cvPoint(f.face_position.x+(50.0*tan(theta)), f.face_position.y+50.0), colors[0], 1);
+}
+
 int main(int argc, char **argv) {
   const char *filename = NULL;
   if(argc > 1)
@@ -84,7 +102,7 @@ int main(int argc, char **argv) {
   Features f;
   bool track = false;
   double model[9][3];
-  double theta[3] = {0,0,0};
+  double theta = 0;
   
   while((current_frame = cam.GetFrame())) {
     cvResize(current_frame, small_img, CV_INTER_LINEAR);
@@ -93,8 +111,6 @@ int main(int argc, char **argv) {
     cvEqualizeHist(gray,gray);
     
     if(track) {
-      // tmp
-//      f = detector.ColdStart(gray);
       detector.TrackFeatures(gray, f, model, theta);
 //      DrawFace(small_img, f, false);
       detector.FitModel(f, model, theta);
@@ -104,9 +120,10 @@ int main(int argc, char **argv) {
       double vScale=0.5;
       int    lineWidth=1;
       cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX, hScale,vScale,0,lineWidth);
-      char buf[100];
-      sprintf(buf,"t1:%f t2:%f t3:%f",theta[0],theta[1],theta[2]);
+      char buf[50];
+      sprintf(buf,"tz:%f",theta);
       cvPutText (small_img,buf,cvPoint(200,400), &font, cvScalar(255,255,0));
+      draw_cross(small_img,f,theta);
     } else {
       f = detector.ColdStart(gray);
     }
@@ -116,13 +133,14 @@ int main(int argc, char **argv) {
     }
 
     cvShowImage(WINDOW_NAME, small_img);
-	  if(cvWaitKey(10) == 't') {
+	  char key = cvWaitKey(10);
+	  if(key == 't') {
 		  track = true;
 		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
 	  }
-	  if(cvWaitKey(10) == 'a') {
-		  if(theta[3]<0.1) f = detector.ColdStart(gray);
+	  if(key == 'a') {
+		  f = detector.ColdStart(gray);
 		  track = true;
 		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
