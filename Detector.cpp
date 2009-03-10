@@ -30,7 +30,7 @@ Features Detector::ColdStart(IplImage *img) {
   return features;
 }
 
-void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][3], double theta[3]) {  
+void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][3], double& theta) {  
   grey = cvCloneImage(img);
 	cvCalcOpticalFlowPyrLK( prev_grey, grey, prev_pyramid, pyramid,
 						   points[0], points[1], count, cvSize(win_size,win_size), 3, status, 0,
@@ -92,7 +92,7 @@ void Detector::SetupTracking(IplImage *img, Features& features) {
 	count=9;
 }
 
-void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3], double theta[3]) {
+void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3], double theta) {
 	//LR = +-theta[0]
 	//UD = +-theta[1]
 	//L/R rotate = +-theta[2]
@@ -107,7 +107,7 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3],
 	std::cout<<features.horiz_slope<<std::endl;
 	double scale1[2] = {1/0.11,1/0.11};
 	//theta[0] = 1;
-	theta[0] = (cvSqrt((features.nostril_positions[0].x-features.nostril_positions[1].x)*(features.nostril_positions[0].x-features.nostril_positions[1].x) + (features.nostril_positions[0].y-features.nostril_positions[1].y)*(features.nostril_positions[0].y-features.nostril_positions[1].y)))/features.face_size;
+//	theta[0] = (cvSqrt((features.nostril_positions[0].x-features.nostril_positions[1].x)*(features.nostril_positions[0].x-features.nostril_positions[1].x) + (features.nostril_positions[0].y-features.nostril_positions[1].y)*(features.nostril_positions[0].y-features.nostril_positions[1].y)))/features.face_size;
 //	std::cout<<theta[0]<<std::endl;
 	CvMat *perspective_projection = cvCreateMat(3,3,CV_32FC1);
 	CvPoint nb;
@@ -136,9 +136,9 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3],
 	cvFindHomography(src,dst,perspective_projection);
 	
 //	printf("%f\n",theta[0]);
-	cvRectangle(out, cvPoint(nb.x-scale1[1]*theta[0]*l-w,scale1[0]*theta[0]*(features.eyebrow_ends[0].y+nb.y)/2), cvPoint(nb.x-scale1[1]*theta[0]*l,(features.eyebrow_ends[0].y+nb.y)/2+h), cvScalar(0,0,255), 1, 8, 0);
-	cvRectangle(out, cvPoint(nb.x+scale1[0]*theta[0]*l,(features.eyebrow_ends[1].y+nb.y)/2), cvPoint(nb.x+scale1[0]*theta[0]*l+scale1[0]*theta[0]*w,scale1[1]*theta[0]*(features.eyebrow_ends[1].y+nb.y)/2+scale1[0]*theta[0]*h), cvScalar(0,0,255), 1, 8, 0);
-	cvLine(out,cvPoint(nb.x-scale1[1]*theta[0]*l,(features.eyebrow_ends[0].y+nb.y)/2+h/2),cvPoint(nb.x+scale1[0]*theta[0]*l,(features.eyebrow_ends[1].y+nb.y)/2+h/2), cvScalar(0,0,255), 1, 8, 0);
+//	cvRectangle(out, cvPoint(nb.x-scale1[1]*theta[0]*l-w,scale1[0]*theta[0]*(features.eyebrow_ends[0].y+nb.y)/2), cvPoint(nb.x-scale1[1]*theta[0]*l,(features.eyebrow_ends[0].y+nb.y)/2+h), cvScalar(0,0,255), 1, 8, 0);
+//	cvRectangle(out, cvPoint(nb.x+scale1[0]*theta[0]*l,(features.eyebrow_ends[1].y+nb.y)/2), cvPoint(nb.x+scale1[0]*theta[0]*l+scale1[0]*theta[0]*w,scale1[1]*theta[0]*(features.eyebrow_ends[1].y+nb.y)/2+scale1[0]*theta[0]*h), cvScalar(0,0,255), 1, 8, 0);
+//	cvLine(out,cvPoint(nb.x-scale1[1]*theta[0]*l,(features.eyebrow_ends[0].y+nb.y)/2+h/2),cvPoint(nb.x+scale1[0]*theta[0]*l,(features.eyebrow_ends[1].y+nb.y)/2+h/2), cvScalar(0,0,255), 1, 8, 0);
 	
 	//	cvRectangle(out, cvPoint(nb.x-l-w,(features.eyebrow_ends[0].y+nb.y)/2), cvPoint(nb.x-l,(features.eyebrow_ends[0].y+nb.y)/2+h), cvScalar(0,0,255), 1, 8, 0);
 	//	cvRectangle(out, cvPoint(nb.x+l,(features.eyebrow_ends[1].y+nb.y)/2), cvPoint(nb.x+l+w,(features.eyebrow_ends[1].y+nb.y)/2+h), cvScalar(0,0,255), 1, 8, 0);
