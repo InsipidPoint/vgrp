@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
 		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
 	  }
-	  if(key == 'a' || (f.theta < 0.1 && docoldstart)) {
+	  if(key == 'a' || (fabs(f.theta) < 0.1 && docoldstart)) {
 		  f = detector.ColdStart(gray);
 		  track = true;
 		  docoldstart = false;
@@ -146,6 +146,8 @@ int main(int argc, char **argv) {
 	  if((fabs(detector.speed[0]) > 1 && fabs(detector.speed[1]) > 1)) {
 		  docoldstart = true;  
 	  }
+	  
+//	  docoldstart = false;
   }
   
   cvReleaseImage( &gray );
