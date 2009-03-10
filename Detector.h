@@ -12,6 +12,16 @@ typedef struct _features {
   CvPoint nose_bridge;
   CvPoint pupils[2];
   CvPoint eyebrow_ends[2];
+
+  double horiz_slope;
+  double vert_slope;
+  double horiz_lengths[2];
+  double vert_lengths[2];
+  double horiz_rotation;
+  double vert_rotation;
+  double past_horiz_rotations[5];
+  double past_vert_rotations[5];
+
   double theta;
 } Features;
 
@@ -36,6 +46,8 @@ private:
 	void FindEyebrowEnds(IplImage *face_img, Features& features);
 	
   void FindFaceCenter(Features& features);
+  void FindInitialLengths(Features& features);
+  void FindRotation(Features& features);
   
   CvMemStorage* storage;
   CvHaarClassifierCascade* cascade;
