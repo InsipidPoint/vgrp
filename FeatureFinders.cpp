@@ -10,15 +10,15 @@ void Detector::FindFace(IplImage *img, Features& features) {
   if(faces && faces->total) {
       CvRect* r = (CvRect*)cvGetSeqElem(faces, 0);
       features.face_size = r->width;
-      features.face_position = cvPoint(r->x,r->y);
+      features.face_position = cvPoint(r->x+0.5*r->width,r->y+0.5*r->width);
   } else {
     features.face_size = 0;
   }
 }
 
 void Detector::FindLips(IplImage *img, Features& features) {
-  int tlx = cvRound(features.face_position.x+features.face_size*0.25);
-  int tly = cvRound(features.face_position.y+features.face_size-features.face_size*0.25);
+  int tlx = cvRound(features.face_position.x-features.face_size*0.25);
+  int tly = cvRound(features.face_position.y+features.face_size*0.25);
   int width = cvRound(features.face_size*0.5), height = cvRound(features.face_size*0.25);
   CvRect roi = cvRect(tlx, tly, width, height);
   cvSetImageROI(img, roi);
@@ -193,8 +193,8 @@ double max(double x, double y) {
 
 void Detector::FindNostrils(IplImage *img, Features& features) {
 	
-	int tlx = cvRound(features.face_position.x+features.face_size/3.0);
-	int tly = cvRound(features.face_position.y+features.face_size/2.0);
+	int tlx = cvRound(features.face_position.x-features.face_size*0.5+features.face_size/3.0);
+	int tly = cvRound(features.face_position.y-features.face_size*0.5+features.face_size/2.0);
 	int width = cvRound(features.face_size/3.0);
 	int halfWidth = width/2.0;
 	int height = cvRound(features.face_size/5.0);
@@ -243,8 +243,8 @@ void Detector::FindNostrils(IplImage *img, Features& features) {
 
 
 void Detector::FindNoseBridge(IplImage *img, Features& features) {
-	int tlx = cvRound(features.face_position.x);
-	int tly = cvRound(features.face_position.y);
+	int tlx = cvRound(features.face_position.x-features.face_size*0.5);
+	int tly = cvRound(features.face_position.y-features.face_size*0.5);
 	int width = cvRound(features.face_size), height = cvRound(features.face_size);
 
 	CvRect roi = cvRect(tlx, tly, width, height);
@@ -272,8 +272,8 @@ void Detector::FindNoseBridge(IplImage *img, Features& features) {
 }
 
 void Detector::FindPupils(IplImage *img, Features& features) {
-	int tlx = cvRound(features.face_position.x);
-	int tly = cvRound(features.face_position.y);
+	int tlx = cvRound(features.face_position.x-features.face_size*0.5);
+	int tly = cvRound(features.face_position.y-features.face_size*0.5);
 	int width = cvRound(features.face_size), height = cvRound(features.face_size);
 	
 	CvRect roi = cvRect(tlx, tly, width, height);
@@ -317,9 +317,9 @@ void Detector::FindPupils(IplImage *img, Features& features) {
 }
 
 void Detector::FindEyebrowEnds(IplImage *img, Features& features) {
-	int tlx = cvRound(features.face_position.x);
-	int tly = cvRound(features.face_position.y);
-	int width = cvRound(features.face_size), height = cvRound(features.face_size);
+	int tlx = cvRound(features.face_position.x-features.face_size*0.5);
+	int tly = cvRound(features.face_position.y-features.face_size*0.5);
+	int width = features.face_size, height = features.face_size;
 	
 	CvRect roi = cvRect(tlx, tly, width, height);
 	cvSetImageROI(img, roi);
