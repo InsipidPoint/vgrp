@@ -42,7 +42,7 @@ void DrawFace(IplImage *img, Features &f) {
 	// draw eyebrow ends
 	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[4], 3, 8, 0);
 	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[4], 3, 8, 0);
-	
+
 }
 
 int main(int argc, char **argv) {
@@ -70,12 +70,13 @@ int main(int argc, char **argv) {
     
     if(track) {
       // tmp
-      f = detector.ColdStart(gray);
-      
+//      f = detector.ColdStart(gray);
       detector.TrackFeatures(gray, f, model, theta);
+		printf("%d %d\n",f.horiz_slope,f.vert_slope);
     } else {
       f = detector.ColdStart(gray);
       detector.GetModel(f, model);
+//		printf("%d %d\n",f.eyebrow_ends[1].x,f.eyebrow_ends[1].y);
     }
     
     if(f.face_size) {

@@ -119,7 +119,7 @@ void Detector::FitModel(Features& features, double model[9][3], double theta[3])
       }
     }
     
-    printf("%f %f %f\n", new_theta[0], new_theta[1], new_theta[2]);
+//    printf("%f %f %f\n", new_theta[0], new_theta[1], new_theta[2]);
     theta[0] = new_theta[0];
     theta[1] = new_theta[1];
     theta[2] = new_theta[2];

@@ -25,6 +25,9 @@ public:
   void TrackFeatures(IplImage *img, Features& features, double model[9][3], double theta[3]);
 	void SetupTracking(IplImage *img, Features& features);
   void GetModel(Features& features, double model[9][3]);
+	
+	void FitGlasses(IplImage *img, Features& features, double model[9][3], double theta[3]);
+
 private:
   void FindFace(IplImage *img, Features& features);
   void FindLips(IplImage *face_img, Features& features);
