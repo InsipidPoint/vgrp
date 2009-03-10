@@ -74,6 +74,7 @@ void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][
   FindFaceCenter(features);
   FindRotation(features);
 	
+	std::cout<<features.horiz_rotation<<" "<<features.vert_rotation<<std::endl;
 //	FitModel(features, model, theta);
 //	FitGlasses(img,features,model,theta);
 }
