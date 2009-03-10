@@ -14,6 +14,12 @@ typedef struct _features {
   CvPoint eyebrow_ends[2];
   double horiz_slope;
   double vert_slope;
+  double horiz_lengths[2];
+  double vert_lengths[2];
+  double horiz_rotation;
+  double vert_rotation;
+  double past_horiz_rotations[5];
+  double past_vert_rotations[5];
 } Features;
 
 class Detector {
@@ -36,6 +42,8 @@ private:
 	void FindEyebrowEnds(IplImage *face_img, Features& features);
 	
   void FindFaceCenter(Features& features);
+  void FindInitialLengths(Features& features);
+  void FindRotation(Features& features);
   
   CvMemStorage* storage;
   CvHaarClassifierCascade* cascade;

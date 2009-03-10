@@ -24,6 +24,7 @@ Features Detector::ColdStart(IplImage *img) {
 	  FindPupils(img,features);
 	  FindEyebrowEnds(img,features);
     FindFaceCenter(features);
+    FindInitialLengths(features);
   }
   return features;
 }
@@ -59,6 +60,7 @@ void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][
 	features.eyebrow_ends[1] = cvPointFrom32f(points[0][8]);
 
   FindFaceCenter(features);
+  FindRotation(features);
 	
 //	FitModel(features, model, theta);
 }
