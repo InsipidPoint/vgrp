@@ -30,7 +30,7 @@ Features Detector::ColdStart(IplImage *img) {
   return features;
 }
 
-void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][3], double& theta) {  
+void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][3]) {  
   grey = cvCloneImage(img);
 	cvCalcOpticalFlowPyrLK( prev_grey, grey, prev_pyramid, pyramid,
 						   points[0], points[1], count, cvSize(win_size,win_size), 3, status, 0,
@@ -92,7 +92,7 @@ void Detector::SetupTracking(IplImage *img, Features& features) {
 	count=9;
 }
 
-void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3], double theta) {
+void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3]) {
 	//LR = +-theta[0]
 	//UD = +-theta[1]
 	//L/R rotate = +-theta[2]
@@ -104,7 +104,7 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3],
 	double w = delta[0]*features.face_size;
 	double h = delta[1]*features.face_size;
 	double l = delta[2]*features.face_size;
-	std::cout<<features.horiz_slope<<std::endl;
+//	std::cout<<features.horiz_slope<<std::endl;
 	double scale1[2] = {1/0.11,1/0.11};
 	//theta[0] = 1;
 //	theta[0] = (cvSqrt((features.nostril_positions[0].x-features.nostril_positions[1].x)*(features.nostril_positions[0].x-features.nostril_positions[1].x) + (features.nostril_positions[0].y-features.nostril_positions[1].y)*(features.nostril_positions[0].y-features.nostril_positions[1].y)))/features.face_size;

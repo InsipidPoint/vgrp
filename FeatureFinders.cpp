@@ -11,6 +11,7 @@ void Detector::FindFace(IplImage *img, Features& features) {
       CvRect* r = (CvRect*)cvGetSeqElem(faces, 0);
       features.face_size = r->width;
       features.face_position = cvPoint(r->x+0.5*r->width,r->y+0.5*r->width);
+      features.theta = 0;
   } else {
     features.face_size = 0;
   }
@@ -493,8 +494,8 @@ void Detector::FindFaceCenter(Features& features) {
     }
   }
 
-  double horiz_ang = angles[maxIndex];
-  features.horiz_slope = slopes[maxIndex];
+//  double horiz_ang = angles[maxIndex];
+//  features.horiz_slope = slopes[maxIndex];
 //  std::cout << "horz ang: " << horiz_ang << std::endl;
 //  std::cout << "nostrils: " << angles[0] << std::endl;
 //  std::cout << "mouth: " << angles[1] << std::endl;
@@ -536,8 +537,8 @@ void Detector::FindFaceCenter(Features& features) {
     }
   }
 
-  double vert_ang = angles2[maxIndex];
-  features.vert_slope = slopes2[maxIndex];
+//  double vert_ang = angles2[maxIndex];
+//  features.vert_slope = slopes2[maxIndex];
 //  std::cout << "vert ang: " << vert_ang << std::endl;
 //  std::cout << "1: " << angles2[0] << std::endl;
 //  std::cout << "2: " << angles2[1] << std::endl;

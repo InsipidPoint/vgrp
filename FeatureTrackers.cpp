@@ -78,7 +78,7 @@ int compare(const void * a, const void * b) {
 }
 
 #define RANGE 0.75
-void Detector::FitModel(Features& features, double model[9][3], double& theta) {  
+void Detector::FitModel(Features& features, double model[9][3]) {    
   double observed[9][3], best_fit[9][3], new_theta, scores[9], new_center[2];
   double min_val = 9999999;
   GetModel(features,observed);
@@ -86,7 +86,7 @@ void Detector::FitModel(Features& features, double model[9][3], double& theta) {
   double center_x = features.face_position.x;
   double center_y = features.face_position.y;
   
-  for(double tz = theta-RANGE; tz <= theta+RANGE; tz += 0.05) {
+  for(double tz = features.theta-RANGE; tz <= features.theta+RANGE; tz += 0.05) {
     for(double cx = -30; cx <= 30; cx+=3) {
       for(double cy = -30; cy <= 30; cy+=3) {
         double model_copy[9][3], score;
@@ -111,7 +111,7 @@ void Detector::FitModel(Features& features, double model[9][3], double& theta) {
   
   printf("min: %f\n", min_val);
 
-  theta = new_theta;
+  features.theta = new_theta;
   
   features.face_position.x = new_center[0];
   features.face_position.y = new_center[1];
