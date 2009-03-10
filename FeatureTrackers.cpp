@@ -63,12 +63,12 @@ void Detector::GetModel(Features& features, double model[9][3]) {
   model[8][2] = 1;
 }
 
-void copy_arrays(double s[9][3], double d[9][3]) {
+void inline copy_arrays(double s[9][3], double d[9][3], double scale = 1) {
   for(size_t i = 0; i < 9; ++i)
   {
     for(size_t j = 0; j < 3; ++j)
     {
-      d[i][j] = s[i][j];
+      d[i][j] = scale*s[i][j];
     }
   }
 }
@@ -78,45 +78,49 @@ int compare(const void * a, const void * b) {
 }
 
 #define RANGE 0.75
-void Detector::FitModel(Features& features, double model[9][3], double& theta) {  
+void Detector::FitModel(Features& features, double model[9][3]) {    
   double observed[9][3], best_fit[9][3], new_theta, scores[9], new_center[2];
   double min_val = 9999999;
   GetModel(features,observed);
   
   double center_x = features.face_position.x;
   double center_y = features.face_position.y;
+  double min_z;
   
-  for(double tz = theta-RANGE; tz <= theta+RANGE; tz += 0.05) {
+  for(double tz = features.theta-RANGE; tz <= features.theta+RANGE; tz += 0.05) {
     for(double cx = -30; cx <= 30; cx+=3) {
       for(double cy = -30; cy <= 30; cy+=3) {
-        double model_copy[9][3], score;
-        copy_arrays(model,model_copy);
-        for(int i = 0; i < 9; i++) {
-          rot_z(tz,model_copy[i]);
-          scores[i] = pow(observed[i][0]-cx - model_copy[i][0],2) + pow(observed[i][1]-cy - model_copy[i][1],2);
-        }
-        qsort(scores, 9, sizeof(double), compare);
-        
-        score = scores[0]+scores[1]+scores[2]+scores[3]+scores[4];
-        if(min_val > score) {              
-          min_val = score;
-          new_theta = tz;
-          new_center[0] = center_x + cx;
-          new_center[1] = center_y + cy;
-          copy_arrays(model_copy,best_fit);
+//      for(double z = 0.8; z <= 1.2; z+=0.1) {
+          double model_copy[9][3], score;
+          copy_arrays(model,model_copy);
+          for(int i = 0; i < 9; i++) {
+            rot_z(tz,model_copy[i]);
+            scores[i] = pow(observed[i][0]-cx - model_copy[i][0],2) + pow(observed[i][1]-cy - model_copy[i][1],2);
+//          scores[i] = pow(observed[i][0]-cx - z*model_copy[i][0],2) + pow(observed[i][1]-cy - z*model_copy[i][1],2);
+          }
+          qsort(scores, 9, sizeof(double), compare);
+
+          score = scores[0]+scores[1]+scores[2]+scores[3]+scores[4];
+          if(min_val > score) {              
+            min_val = score;
+            new_theta = tz;
+            new_center[0] = center_x + cx;
+            new_center[1] = center_y + cy;
+            copy_arrays(model_copy,best_fit);
+//            min_z = z;
+//         }
         }
       }
     }
   }
   
-//  printf("min: %f\n", min_val);
 
-  theta = new_theta;
+  features.theta = new_theta;
   
   features.face_position.x = new_center[0];
   features.face_position.y = new_center[1];
-//  return;
-  // remove
+  return;
+//remove
   features.nostril_positions[0].x = best_fit[0][0] + new_center[0];
   features.nostril_positions[0].y = best_fit[0][1] + new_center[1];
   features.nostril_positions[1].x = best_fit[1][0] + new_center[0];

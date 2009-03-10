@@ -26,11 +26,12 @@ Features Detector::ColdStart(IplImage *img) {
 	  FindPupils(img,features);
 	  FindEyebrowEnds(img,features);
     FindFaceCenter(features);
+    FindInitialLengths(features);
   }
   return features;
 }
 
-void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][3], double& theta) {  
+void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][3]) {  
   grey = cvCloneImage(img);
 	cvCalcOpticalFlowPyrLK( prev_grey, grey, prev_pyramid, pyramid,
 						   points[0], points[1], count, cvSize(win_size,win_size), 3, status, 0,
@@ -71,6 +72,7 @@ void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][
 	features.eyebrow_ends[1] = cvPointFrom32f(points[0][8]);
 
   FindFaceCenter(features);
+  FindRotation(features);
 	
 //	FitModel(features, model, theta);
 //	FitGlasses(img,features,model,theta);
@@ -131,7 +133,7 @@ void rot(double theta, CvPoint& pt) {
 	pt.y = -sin(theta)*p1 + cos(theta)*p2;
 }
 
-void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3], double theta) {
+void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3]) {
 	//LR = +-theta[0]
 	//UD = +-theta[1]
 	//L/R rotate = +-theta[2]
@@ -145,6 +147,7 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3],
 	double l = delta[2]*features.face_size;
 //	std::cout<<features.horiz_slope<<std::endl;
 	double scale1[2] = {1,1};
+	//theta[0] = 1;
 //	theta[0] = (cvSqrt((features.nostril_positions[0].x-features.nostril_positions[1].x)*(features.nostril_positions[0].x-features.nostril_positions[1].x) + (features.nostril_positions[0].y-features.nostril_positions[1].y)*(features.nostril_positions[0].y-features.nostril_positions[1].y)))/features.face_size;
 //	std::cout<<theta[0]<<std::endl;
 //	CvMat *perspective_projection = cvCreateMat(3,3,CV_32FC1);
@@ -200,14 +203,14 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3],
 	for(int i=0;i<2;i++) {
 		for(int j=0;j<4;j++) {
 			new_glasses[i][j] = glasses[i][j];
-			rot(theta,new_glasses[i][j]);
+			rot(features.theta,new_glasses[i][j]);
 		}
 	}
 	
 	new_glasses[2][0] = glasses[2][0];
-	rot(theta,new_glasses[2][0]);
+	rot(features.theta,new_glasses[2][0]);
 	new_glasses[2][1] = glasses[2][1];
-	rot(theta,new_glasses[2][1]);
+	rot(features.theta,new_glasses[2][1]);
 	points[0][0] = cvPoint(nb.x+new_glasses[0][0].x,nb.y+new_glasses[0][0].y);
 	points[0][1] = cvPoint(nb.x+new_glasses[0][1].x,nb.y+new_glasses[0][1].y);
 	points[0][2] = cvPoint(nb.x+new_glasses[0][2].x,nb.y+new_glasses[0][2].y);

@@ -11,6 +11,7 @@ void Detector::FindFace(IplImage *img, Features& features) {
       CvRect* r = (CvRect*)cvGetSeqElem(faces, 0);
       features.face_size = r->width;
       features.face_position = cvPoint(r->x+0.5*r->width,r->y+0.5*r->width);
+      features.theta = 0;
   } else {
     features.face_size = 0;
   }
@@ -493,8 +494,8 @@ void Detector::FindFaceCenter(Features& features) {
     }
   }
 
-  double horiz_ang = angles[maxIndex];
-  features.horiz_slope = slopes[maxIndex];
+//  double horiz_ang = angles[maxIndex];
+//  features.horiz_slope = slopes[maxIndex];
 //  std::cout << "horz ang: " << horiz_ang << std::endl;
 //  std::cout << "nostrils: " << angles[0] << std::endl;
 //  std::cout << "mouth: " << angles[1] << std::endl;
@@ -514,12 +515,15 @@ void Detector::FindFaceCenter(Features& features) {
 
   slopes2[4] = double(centers[3].x-centers[1].x)/double(centers[3].y-centers[1].y);
 
-
   angles2[0] = atan(slopes2[0]);
   angles2[1] = atan(slopes2[1]);
   angles2[2] = atan(slopes2[2]);
   angles2[3] = atan(slopes2[3]);
   angles2[4] = atan(slopes2[4]);
+
+  for (int i = 0; i < 5; i++) {
+    
+  }
 
   int counts2[5];
   maxCount = 0, maxIndex = 0;
@@ -536,8 +540,8 @@ void Detector::FindFaceCenter(Features& features) {
     }
   }
 
-  double vert_ang = angles2[maxIndex];
-  features.vert_slope = slopes2[maxIndex];
+//  double vert_ang = angles2[maxIndex];
+//  features.vert_slope = slopes2[maxIndex];
 //  std::cout << "vert ang: " << vert_ang << std::endl;
 //  std::cout << "1: " << angles2[0] << std::endl;
 //  std::cout << "2: " << angles2[1] << std::endl;
@@ -546,6 +550,73 @@ void Detector::FindFaceCenter(Features& features) {
 //  std::cout << "5: " << angles2[4] << std::endl;
 //  std::cout << "#####" << std::endl;
 
+}
+
+void Detector::FindInitialLengths(Features& features) {
+  features.horiz_lengths[0] = sqrt((features.pupils[1].x-features.pupils[0].x)*(features.pupils[1].x-features.pupils[0].x)+(features.pupils[1].y-features.pupils[0].y)*(features.pupils[1].y-features.pupils[0].y));
+  features.horiz_lengths[1] = sqrt((features.lip_positions[1].x-features.lip_positions[0].x)*(features.lip_positions[1].x-features.lip_positions[0].x)+(features.lip_positions[1].y-features.lip_positions[0].y)*(features.lip_positions[1].y-features.lip_positions[0].y));
+
+  CvPoint centers[2];
+  centers[0].x = (features.nostril_positions[0].x+features.nostril_positions[1].x)/2.0;
+  centers[0].y = (features.nostril_positions[0].y+features.nostril_positions[1].y)/2.0;
+
+  centers[1].x = (features.lip_positions[0].x+features.lip_positions[1].x)/2.0;
+  centers[1].y = (features.lip_positions[0].y+features.lip_positions[1].y)/2.0;
+
+  features.vert_lengths[0] = sqrt((features.nose_bridge.x-centers[0].x)*(features.nose_bridge.x-centers[0].x)+(features.nose_bridge.y-centers[0].y)*(features.nose_bridge.y-centers[0].y));  
+  features.vert_lengths[1] = sqrt((features.nose_bridge.x-centers[1].x)*(features.nose_bridge.x-centers[1].x)+(features.nose_bridge.y-centers[1].y)*(features.nose_bridge.y-centers[1].y));
+
+  for (int i = 0; i < 5; i++) {
+    features.past_horiz_rotations[i] = 0;
+    features.past_vert_rotations[i] = 0;
+  }
+}
+
+void Detector::FindRotation(Features& features) {
+  double horiz1 = sqrt((features.pupils[1].x-features.pupils[0].x)*(features.pupils[1].x-features.pupils[0].x)+(features.pupils[1].y-features.pupils[0].y)*(features.pupils[1].y-features.pupils[0].y));  
+  double ratio1 = horiz1/features.horiz_lengths[0];
+  if (ratio1 > 1) ratio1 = 1.0;
+  double angle1 = acos(ratio1);
+  double horiz2 = sqrt((features.lip_positions[1].x-features.lip_positions[0].x)*(features.lip_positions[1].x-features.lip_positions[0].x)+(features.lip_positions[1].y-features.lip_positions[0].y)*(features.lip_positions[1].y-features.lip_positions[0].y));
+  double ratio2 = horiz2/features.horiz_lengths[1];
+  if (ratio2 > 1) ratio2 = 1.0;
+  double angle2 = acos(ratio2);
+
+  double sum = 0;
+  for (int i = 4; i > 0; i--) {
+    features.past_horiz_rotations[i] = features.past_horiz_rotations[i-1];
+    sum = sum + features.past_horiz_rotations[i];  
+  }
+  features.past_horiz_rotations[0] = (angle1+angle2)/2.0;
+  sum = sum + features.past_horiz_rotations[0];
+  features.horiz_rotation = sum/5.0;
+  //std::cout << "horiz: " << features.horiz_rotation << std::endl;
+
+  CvPoint centers[2];
+  centers[0].x = (features.nostril_positions[0].x+features.nostril_positions[1].x)/2.0;
+  centers[0].y = (features.nostril_positions[0].y+features.nostril_positions[1].y)/2.0;
+
+  centers[1].x = (features.lip_positions[0].x+features.lip_positions[1].x)/2.0;
+  centers[1].y = (features.lip_positions[0].y+features.lip_positions[1].y)/2.0;
+
+  double vert1 = sqrt((features.nose_bridge.x-centers[0].x)*(features.nose_bridge.x-centers[0].x)+(features.nose_bridge.y-centers[0].y)*(features.nose_bridge.y-centers[0].y));
+  ratio1 = vert1/features.vert_lengths[0];
+  if (ratio1 > 1) ratio1 = 1.0;
+  angle1 = acos(ratio1);
+  double vert2 = sqrt((features.nose_bridge.x-centers[1].x)*(features.nose_bridge.x-centers[1].x)+(features.nose_bridge.y-centers[1].y)*(features.nose_bridge.y-centers[1].y));
+  ratio2 = vert2/features.vert_lengths[1];
+  if (ratio2 > 1) ratio2 = 1.0;
+  angle2 = acos(ratio2);
+
+  sum = 0;
+  for (int i = 4; i > 0; i--) {
+    features.past_vert_rotations[i] = features.past_vert_rotations[i-1];  
+    sum = sum + features.past_vert_rotations[i];  
+  }
+  features.past_vert_rotations[0] = (angle1+angle2)/2.0;
+  sum = sum + features.past_vert_rotations[0];
+  features.vert_rotation = sum/5.0;
+  //std::cout << "vert: " << features.vert_rotation << std::endl;
 }
 
 
