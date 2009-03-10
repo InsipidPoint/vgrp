@@ -61,7 +61,7 @@ void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][
 	features.eyebrow_ends[1] = cvPointFrom32f(points[0][8]);
 	
 //	FitModel(features, model, theta);
-	FitGlasses(img,features,model,theta);
+//	FitGlasses(img,features,model,theta);
 }
 
 void Detector::SetupTracking(IplImage *img, Features& features) {	

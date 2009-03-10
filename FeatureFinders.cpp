@@ -440,6 +440,9 @@ void Detector::FindEyebrowEnds(IplImage *img, Features& features) {
 	features.eyebrow_ends[1].x = a2+tlx;
 	features.eyebrow_ends[1].y = b2+tly;
 
+//	if(a2<0 || b2<0) {
+//		printf("%d %d %d %d\n", rightx, righty, rightw, righth);	
+//	}
 //	printf("%d %d\n", a2,a2);
 	
 	cvResetImageROI(img);
