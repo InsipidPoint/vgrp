@@ -136,6 +136,7 @@ int main(int argc, char **argv) {
 		  detector.SetupTracking(gray,f);
 	  }
 	  if(key == 'a' || (fabs(f.theta) < 0.1 && docoldstart)) {
+		  printf("Auto Restart\n");
 		  f = detector.ColdStart(gray);
 		  track = true;
 		  docoldstart = false;
@@ -143,7 +144,7 @@ int main(int argc, char **argv) {
 		  detector.SetupTracking(gray,f);
 	  }
 	  
-	  if((fabs(detector.speed[0]) > 1 && fabs(detector.speed[1]) > 1)) {
+	  if((fabs(detector.speed[0]) > 2 && fabs(detector.speed[1]) > 2)) {
 		  docoldstart = true;  
 	  }
 	  

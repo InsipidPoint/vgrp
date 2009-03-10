@@ -55,7 +55,7 @@ void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][
 	}
 	speed[0]/=9;
 	speed[1]/=9;
-	std::cout<<speed[0]<<" "<<speed[1]<<std::endl;
+//	std::cout<<speed[0]<<" "<<speed[1]<<std::endl;
 	
 	CV_SWAP( prev_grey, grey, swap_temp );
 	CV_SWAP( prev_pyramid, pyramid, swap_temp );
