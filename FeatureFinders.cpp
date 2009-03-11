@@ -12,6 +12,7 @@ void Detector::FindFace(IplImage *img, Features& features) {
       features.face_size = r->width;
       features.face_position = cvPoint(r->x+0.5*r->width,r->y+0.5*r->width);
       features.theta = 0;
+      features.z = 1;
   } else {
     features.face_size = 0;
   }

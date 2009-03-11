@@ -349,8 +349,8 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3])
 //	cvCircle(out,cvPoint(nb.x+center2.x,nb.y+center2.y),30,cvScalar(0,0,0),4,8,0);
 //	std::cout<<features.rot_dir[0]<<" "<<features.rot_dir[1]<<std::endl;
 	std::cout<<features.horiz_rotation<<" "<<features.vert_rotation<<std::endl;
-	cvEllipse(out,cvPoint(nb.x+newcenter1.x,nb.y+newcenter1.y),cvSize(20+deltas[0],20+deltas[1]),theta*180/3.14,0,360,cvScalar(0,0,0),4,8,0);
-	cvEllipse(out,cvPoint(nb.x+newcenter2.x,nb.y+newcenter2.y),cvSize(20+deltas[2],20+deltas[3]),theta*180/3.14,0,360,cvScalar(0,0,0),4,8,0);
+	cvEllipse(out,cvPoint(nb.x+newcenter1.x,nb.y+newcenter1.y),cvSize((20+deltas[0]),(20+deltas[1])),theta*180/3.14,0,360,cvScalar(0,0,0),4,8,0);
+	cvEllipse(out,cvPoint(nb.x+newcenter2.x,nb.y+newcenter2.y),cvSize((20+deltas[2]),(20+deltas[3])),theta*180/3.14,0,360,cvScalar(0,0,0),4,8,0);
 	
 	cvShowImage("result",out);
 	return;
