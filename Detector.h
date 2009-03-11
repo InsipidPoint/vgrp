@@ -29,6 +29,9 @@ typedef struct _features {
 
 	int rot_dir[2];
   double z;
+	
+	CvPoint centers[2];
+	CvSize sizes[2];
 } Features;
 
 class Detector {
