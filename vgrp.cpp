@@ -135,20 +135,38 @@ int main(int argc, char **argv) {
 		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
 	  }
-	  if(key == 'a' || (fabs(f.theta) < 0.1 && docoldstart)) {
+	  if(key == 'a' || (fabs(f.theta) < 0.1 && fabs(f.horiz_rotation)<0.25 && fabs(f.vert_rotation)<0.25 && docoldstart)) {
 		  printf("Auto Restart\n");
 		  f = detector.ColdStart(gray);
 		  track = true;
 		  docoldstart = false;
 		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
+		  
 	  }
 	  
 	  if((fabs(detector.speed[0]) > 2 && fabs(detector.speed[1]) > 2)) {
 		  docoldstart = true;  
 	  }
+	  if(key=='l') {
+		  f.rot_dir[0] = -1;
+	  }
+	  if(key=='r') {
+		  f.rot_dir[0] = 1;
+	  }
+	  if(key=='u') {
+		  f.rot_dir[1] = -1;
+	  }
+	  if(key=='d') {
+		  f.rot_dir[1] = 1;
+	  }
+//	  if(f.horiz_rotation <0.1)
+//		  f.rot_dir[0] = 0;
+//	  if(f.vert_rotation <0.1)
+//		  f.rot_dir[1] = 0;
 	  
-//	  docoldstart = false;
+	  
+	  docoldstart = false;
   }
   
   cvReleaseImage( &gray );
