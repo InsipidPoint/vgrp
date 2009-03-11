@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
 
   CvVideoWriter* vid_writer;
   if (output_flag) {
-    vid_writer = cvCreateVideoWriter("/Users/shiweis/school/CS223B/vgrp/temp.avi", CV_FOURCC('D', 'I', 'V', 'X'), 25,  cvSize(640, 480), 1);
+    vid_writer = cvCreateVideoWriter("/Users/ankit/Courses/CS223B/project/vgrp/temp.avi", CV_FOURCC('D', 'I', 'V', 'X'), 25,  cvSize(640, 480), 1);
   }
   
   while((current_frame = cam.GetFrame())) {
