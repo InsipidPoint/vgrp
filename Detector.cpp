@@ -2,13 +2,13 @@
 #include <cstdio>
 #include <iostream>
 #include <vector>
-#include "math.h"
+#include <cmath>
 
 Detector::Detector() {
   cascade = (CvHaarClassifierCascade*)cvLoad("haarcascade_frontalface_alt.xml", 0, 0, 0);
 	storage = cvCreateMemStorage(0);
 	
-	cvNamedWindow( "result", 0 );
+//	cvNamedWindow( "result", 0 );
 	assert(cascade);
 }
 
@@ -27,6 +27,7 @@ Features Detector::ColdStart(IplImage *img) {
 	  FindEyebrowEnds(img,features);
     FindFaceCenter(features);
     FindInitialLengths(features);
+	  features.nthetas=0;
   }
   return features;
 }
@@ -74,7 +75,7 @@ void Detector::TrackFeatures(IplImage *img, Features& features, double model[9][
   FindFaceCenter(features);
   FindRotation(features);
 	
-	std::cout<<features.horiz_rotation<<" "<<features.vert_rotation<<std::endl;
+//	std::cout<<features.horiz_rotation<<" "<<features.vert_rotation<<std::endl;
 //	FitModel(features, model, theta);
 //	FitGlasses(img,features,model,theta);
 }
@@ -126,6 +127,13 @@ void Detector::SetupTracking(IplImage *img, Features& features) {
 	glasses[1][3] = cvPoint(l,(features.eyebrow_ends[1].y-nb.y)/2+h);
 	glasses[2][0] = cvPoint(-l,(features.eyebrow_ends[0].y-nb.y)/2+h/2);
 	glasses[2][1] = cvPoint(-l,(features.eyebrow_ends[1].y-nb.y)/2+h/2);
+	
+	features.nthetas=0;
+	features.past_centers[0] = (CvPoint*)cvAlloc(5*sizeof(features.past_centers[0][0]));
+	features.past_centers[1] = (CvPoint*)cvAlloc(5*sizeof(features.past_centers[0][0]));
+
+	features.rot_dir[0] = 0;
+	features.rot_dir[1] = 0;
 }
 
 void rot(double theta, CvPoint& pt) {
@@ -148,6 +156,7 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3])
 	double l = delta[2]*features.face_size;
 //	std::cout<<features.horiz_slope<<std::endl;
 	double scale1[2] = {1,1};
+	double scale2[2] = {1,1};
 	//theta[0] = 1;
 //	theta[0] = (cvSqrt((features.nostril_positions[0].x-features.nostril_positions[1].x)*(features.nostril_positions[0].x-features.nostril_positions[1].x) + (features.nostril_positions[0].y-features.nostril_positions[1].y)*(features.nostril_positions[0].y-features.nostril_positions[1].y)))/features.face_size;
 //	std::cout<<theta[0]<<std::endl;
@@ -192,6 +201,27 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3])
 //	features.eyebrow_ends[1].x *= cos(theta[2]);
 //	features.eyebrow_ends[1].y *= sin(theta[2]);
 //	
+	double deltas[6] = {10,10,10,10,0,0};
+	double hor = std::max(0.0,features.horiz_rotation-0.2);
+	double vert = std::max(0.0,features.vert_rotation-0.2);
+	if(features.rot_dir[0]<0) {
+		deltas[0]=10*(1-hor/0.6); //30 -> 20
+		deltas[2]=10+5*(hor/0.6); //30 -> 35
+		deltas[4]+=l*(hor/0.6);
+		std::cout<<"deltas[4]: "<<deltas[4]<<std::endl;
+	}
+	else if(features.rot_dir[0]>0) {
+		deltas[0]=10+5*(hor/0.6); //30 -> 35
+		deltas[2]=10*(1-hor/0.6); //30 -> 20		
+		deltas[5]-=l*0.5*(hor/0.6);
+		std::cout<<"deltas[5]: "<<deltas[5]<<std::endl;
+	}
+	if(features.rot_dir[1]!=0) {
+		deltas[1] = 10*(1-vert/0.6); //30 -> 20
+		deltas[3] = 10*(1-vert/0.6); //30 -> 20
+	}
+
+	
 	CvPoint* points[2] = {0,0};
 	points[0] = (CvPoint*)cvAlloc(4*sizeof(points[0][0]));
 	points[1] = (CvPoint*)cvAlloc(4*sizeof(points[0][0]));
@@ -203,15 +233,34 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3])
 
 	for(int i=0;i<2;i++) {
 		for(int j=0;j<4;j++) {
-			new_glasses[i][j] = glasses[i][j];
+			if(i==0) new_glasses[i][j].x = glasses[i][j].x + deltas[4];
+			else if(i==1) new_glasses[i][j].x = glasses[i][j].x + deltas[5];
+			new_glasses[i][j].y = glasses[i][j].y;
+//			new_glasses[i][j] = glasses[i][j];
 			rot(features.theta,new_glasses[i][j]);
 		}
 	}
 	
+	double theta = 0;
+	if(features.nthetas == 5) {
+	for(int i=1;i<5;i++) {
+		features.past_thetas[i-1] = features.past_thetas[i];
+		theta += features.past_thetas[i];
+	}
+	features.past_thetas[4] = features.theta;
+	theta+=features.past_thetas[4];
+	theta/=5;
+	}
+	else {
+		features.past_thetas[features.nthetas] = features.theta;
+		theta = features.theta;
+//		features.nthetas++;
+	}
+	
 	new_glasses[2][0] = glasses[2][0];
-	rot(features.theta,new_glasses[2][0]);
+	rot(theta,new_glasses[2][0]);
 	new_glasses[2][1] = glasses[2][1];
-	rot(features.theta,new_glasses[2][1]);
+	rot(theta,new_glasses[2][1]);
 	points[0][0] = cvPoint(nb.x+new_glasses[0][0].x,nb.y+new_glasses[0][0].y);
 	points[0][1] = cvPoint(nb.x+new_glasses[0][1].x,nb.y+new_glasses[0][1].y);
 	points[0][2] = cvPoint(nb.x+new_glasses[0][2].x,nb.y+new_glasses[0][2].y);
@@ -239,9 +288,9 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3])
 //	cvLine(out,cvPoint(nb.x-l,(features.eyebrow_ends[0].y+nb.y)/2+h/2),cvPoint(nb.x+l,(features.eyebrow_ends[1].y+nb.y)/2+h/2), cvScalar(0,0,255), 1, 8, 0);
 
 	int npts[1] = {4};
-	cvPolyLine(out,&points[0], npts, 1, 1,cvScalar(0,0,0));
-	cvPolyLine(out,&points[1], npts, 1, 1,cvScalar(0,0,0));
-	cvLine(out,cvPoint(nb.x+new_glasses[2][0].x,nb.y+new_glasses[2][0].y),cvPoint(nb.x+new_glasses[2][1].x,nb.y+new_glasses[2][1].y), cvScalar(0,0,255), 1, 8, 0);
+//	cvPolyLine(out,&points[0], npts, 1, 1,cvScalar(0,0,0));
+//	cvPolyLine(out,&points[1], npts, 1, 1,cvScalar(0,0,0));
+//	cvLine(out,cvPoint(nb.x+new_glasses[2][0].x,nb.y+new_glasses[2][0].y),cvPoint(nb.x+new_glasses[2][1].x,nb.y+new_glasses[2][1].y), cvScalar(0,0,255), 1, 8, 0);
 	
 //	cvCircle(out,cvPoint((nb.x+features.eyebrow_ends[0].x)/2,(nb.y+features.eyebrow_ends[0].y)/2),30,cvScalar(0,0,0),1,8,0);
 //	cvCircle(out,cvPoint((nb.x+features.eyebrow_ends[1].x)/2,(nb.y+features.eyebrow_ends[1].y)/2),30,cvScalar(0,0,0),1,8,0);
@@ -254,9 +303,60 @@ void Detector::FitGlasses(IplImage *img, Features& features, double model[9][3])
 	center2.x = (new_glasses[1][0].x + new_glasses[1][1].x + new_glasses[1][2].x + new_glasses[1][3].x)/4;
 	center2.y = (new_glasses[1][0].y + new_glasses[1][1].y + new_glasses[1][2].y + new_glasses[1][3].y)/4;
 	
-	cvCircle(out,cvPoint(nb.x+center1.x,nb.y+center1.y),30,cvScalar(0,0,0),4,8,0);
-	cvCircle(out,cvPoint(nb.x+center2.x,nb.y+center2.y),30,cvScalar(0,0,0),4,8,0);
+	CvPoint newcenter1,newcenter2;
+	newcenter1.x = 0;
+	newcenter1.y = 0;
+	newcenter2.x = 0;
+	newcenter2.y = 0;
+	if(features.nthetas == 5) {
+	for(int i=1;i<5;i++) {
+		features.past_centers[0][i-1].x = features.past_centers[0][i].x;
+		features.past_centers[0][i-1].y = features.past_centers[0][i].y;
+		newcenter1.x+=features.past_centers[0][i].x;
+		newcenter1.y+=features.past_centers[0][i].y;
 
-	cvShowImage("result",out);
+		features.past_centers[1][i-1].x = features.past_centers[1][i].x;
+		features.past_centers[1][i-1].y = features.past_centers[1][i].y;
+		newcenter2.x+=features.past_centers[1][i].x;
+		newcenter2.y+=features.past_centers[1][i].y;
+		
+	}
+		features.past_centers[0][4].x = center1.x;
+		features.past_centers[0][4].y = center1.y;
+		newcenter1.x+=features.past_centers[0][4].x;
+		newcenter1.y+=features.past_centers[0][4].y;
+
+		
+		features.past_centers[1][4].x = center2.x;
+		features.past_centers[1][4].y = center2.y;
+		newcenter2.x+=features.past_centers[1][4].x;
+		newcenter2.y+=features.past_centers[1][4].y;
+		
+		newcenter1.x/=5;
+		newcenter1.y/=5;
+		newcenter2.x/=5;
+		newcenter2.y/=5;
+	}
+	else {
+		newcenter1 = center1;
+		newcenter2 = center2;
+		features.past_centers[0][features.nthetas] = center1;
+		features.past_centers[1][features.nthetas] = center2;
+		features.nthetas++;
+	}
+//	std::cout<<features.nthetas<<std::endl;
+//	cvCircle(out,cvPoint(nb.x+center1.x,nb.y+center1.y),30,cvScalar(0,0,0),4,8,0);
+//	cvCircle(out,cvPoint(nb.x+center2.x,nb.y+center2.y),30,cvScalar(0,0,0),4,8,0);
+//	std::cout<<features.rot_dir[0]<<" "<<features.rot_dir[1]<<std::endl;
+	std::cout<<features.horiz_rotation<<" "<<features.vert_rotation<<std::endl;
+	features.centers[0] = cvPoint(nb.x+newcenter1.x,nb.y+newcenter1.y);
+	features.centers[1] = cvPoint(nb.x+newcenter2.x,nb.y+newcenter2.y);
+	features.sizes[0] = cvSize((20+deltas[0]),(20+deltas[1]));
+	features.sizes[1] = cvSize((20+deltas[2]),(20+deltas[3]));
+	
+//	cvEllipse(out,cvPoint(nb.x+newcenter1.x,nb.y+newcenter1.y),cvSize((20+deltas[0]),(20+deltas[1])),theta*180/3.14,0,360,cvScalar(0,0,0),4,8,0);
+//	cvEllipse(out,cvPoint(nb.x+newcenter2.x,nb.y+newcenter2.y),cvSize((20+deltas[2]),(20+deltas[3])),theta*180/3.14,0,360,cvScalar(0,0,0),4,8,0);
+//	
+//	cvShowImage("result",out);
 	return;
 }

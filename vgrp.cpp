@@ -23,26 +23,31 @@ void DrawFace(IplImage *img, Features &f, bool col = true) {
   radius = cvRound(f.face_size*0.5);
   
   if(col) {
-    cvCircle( img, f.face_position, radius, colors[0], 3, 8, 0 ); // draw face
-
-    // draw lips
-    cvCircle(img, cvPoint(f.lip_positions[0].x,f.lip_positions[0].y), 1, colors[1], 3, 8, 0);
-    cvCircle(img, cvPoint(f.lip_positions[1].x,f.lip_positions[1].y), 1, colors[1], 3, 8, 0);
-
-  	// draw nostrils
-  	cvCircle(img, cvPoint(f.nostril_positions[0].x,f.nostril_positions[0].y), 1, colors[0], 3, 8, 0);
-  	cvCircle(img, cvPoint(f.nostril_positions[1].x,f.nostril_positions[1].y), 1, colors[0], 3, 8, 0);
-
-  	// draw nose bridge
-  	cvCircle(img, cvPoint(f.nose_bridge.x,f.nose_bridge.y), 1, colors[2], 3, 8, 0);
-
-  	// draw pupils
-  	cvCircle(img, cvPoint(f.pupils[0].x,f.pupils[0].y), 1, colors[3], 3, 8, 0);
-  	cvCircle(img, cvPoint(f.pupils[1].x,f.pupils[1].y), 1, colors[3], 3, 8, 0);
-
-  	// draw eyebrow ends
-  	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[4], 3, 8, 0);
-  	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[4], 3, 8, 0);
+//    cvCircle( img, f.face_position, radius, colors[0], 3, 8, 0 ); // draw face
+//
+//    // draw lips
+//    cvCircle(img, cvPoint(f.lip_positions[0].x,f.lip_positions[0].y), 1, colors[1], 3, 8, 0);
+//    cvCircle(img, cvPoint(f.lip_positions[1].x,f.lip_positions[1].y), 1, colors[1], 3, 8, 0);
+//
+//  	// draw nostrils
+//  	cvCircle(img, cvPoint(f.nostril_positions[0].x,f.nostril_positions[0].y), 1, colors[0], 3, 8, 0);
+//  	cvCircle(img, cvPoint(f.nostril_positions[1].x,f.nostril_positions[1].y), 1, colors[0], 3, 8, 0);
+//
+//  	// draw nose bridge
+//  	cvCircle(img, cvPoint(f.nose_bridge.x,f.nose_bridge.y), 1, colors[2], 3, 8, 0);
+//
+//  	// draw pupils
+//  	cvCircle(img, cvPoint(f.pupils[0].x,f.pupils[0].y), 1, colors[3], 3, 8, 0);
+//  	cvCircle(img, cvPoint(f.pupils[1].x,f.pupils[1].y), 1, colors[3], 3, 8, 0);
+//
+//  	// draw eyebrow ends
+//  	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[4], 3, 8, 0);
+//  	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[4], 3, 8, 0);
+	  
+	cvEllipse(img,f.centers[0],f.sizes[0],f.theta*180/3.14,0,360,cvScalar(0,0,0),4,8,0);
+	  cvEllipse(img,f.centers[1],f.sizes[1],f.theta*180/3.14,0,360,cvScalar(0,0,0),4,8,0);
+	  
+	  
   } else {    
     // draw lips
     cvCircle(img, cvPoint(f.lip_positions[0].x,f.lip_positions[0].y), 1, colors[5], 3, 8, 0);
@@ -70,6 +75,7 @@ void DrawFace(IplImage *img, Features &f, bool col = true) {
   	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[5], 3, 8, 0);
   	cvLine(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), cvPoint(f.pupils[0].x,f.pupils[0].y), colors[5], 1);
   	cvLine(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), cvPoint(f.pupils[1].x,f.pupils[1].y), colors[5], 1);
+
   }
 }
 
@@ -110,8 +116,8 @@ int main(int argc, char **argv) {
 
   CvVideoWriter* vid_writer;
   if (output_flag) {
-    vid_writer = cvCreateVideoWriter(OUTPUT_FILE, CV_FOURCC('D', 'I', 'V', 'X'), 25,  cvSize(640, 480), 1);
-}
+    vid_writer = cvCreateVideoWriter("/Users/ankit/Courses/CS223B/project/vgrp/temp.avi", CV_FOURCC('D', 'I', 'V', 'X'), 15,  cvSize(480, 360), 1);
+  }
   
   while((current_frame = cam.GetFrame())) {
     cvResize(current_frame, small_img, CV_INTER_LINEAR);
@@ -155,6 +161,7 @@ int main(int argc, char **argv) {
 		  docoldstart = false;
 		  detector.GetModel(f, model);
 		  detector.SetupTracking(gray,f);
+		  
 	  }
 
 	  if(key == 'q') {
@@ -168,6 +175,27 @@ int main(int argc, char **argv) {
 	  if((fabs(detector.speed[0]) > 2 && fabs(detector.speed[1]) > 2)) {
 		  docoldstart = true;  
 	  }
+<<<<<<< HEAD:vgrp.cpp
+=======
+	  if(key=='l') {
+		  f.rot_dir[0] = -1;
+	  }
+	  if(key=='r') {
+		  f.rot_dir[0] = 1;
+	  }
+	  if(key=='u') {
+		  f.rot_dir[1] = -1;
+	  }
+	  if(key=='d') {
+		  f.rot_dir[1] = 1;
+	  }
+//	  if(f.horiz_rotation <0.1)
+//		  f.rot_dir[0] = 0;
+//	  if(f.vert_rotation <0.1)
+//		  f.rot_dir[1] = 0;
+	  
+	  
+>>>>>>> ec0692ba6c6ee5155269d7b149b2921de392a679:vgrp.cpp
 	  docoldstart = false;
   }
   

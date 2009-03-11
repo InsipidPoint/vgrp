@@ -23,7 +23,15 @@ typedef struct _features {
   double past_vert_rotations[5];
 
   double theta;
+	int nthetas;
+	double past_thetas[5];
+	CvPoint* past_centers[5];
+
+	int rot_dir[2];
   double z;
+	
+	CvPoint centers[2];
+	CvSize sizes[2];
 } Features;
 
 class Detector {
