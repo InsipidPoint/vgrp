@@ -8,7 +8,8 @@ Detector::Detector() {
   cascade = (CvHaarClassifierCascade*)cvLoad("haarcascade_frontalface_alt.xml", 0, 0, 0);
 	storage = cvCreateMemStorage(0);
 	
-//	cvNamedWindow( "result", 0 );
+	cvNamedWindow( "result", 0 );
+	cvNamedWindow( "result1", 0 );
 	assert(cascade);
 }
 

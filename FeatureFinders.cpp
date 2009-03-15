@@ -341,11 +341,13 @@ void Detector::FindEyebrowEnds(IplImage *img, Features& features) {
 	IplImage *logimagetemp = cvCreateImage( cvSize(image->width,image->height), 8, 1 );
 	IplImage *logimage = cvCreateImage( cvSize(image->width,image->height), 8, 1 );
 	cvAbsDiff(blurredimage1,blurredimage2,logimagetemp);
+
 	int posx,posy;
 	double maximum = findMax(logimagetemp,posx,posy,1);
 	cvConvertScaleAbs(logimagetemp,logimage,255.0/maximum,0);
 	IplImage *cannyimage = cvCreateImage( cvSize(image->width,image->height), 8, 1 );
 	cvCanny(logimage,cannyimage,400,1400,5);
+
 	int ymin = min(y1,y2);
 	int xmin = min(x1,x2);
 	int xmax = max(x1,x2);
@@ -407,6 +409,9 @@ void Detector::FindEyebrowEnds(IplImage *img, Features& features) {
 	IplImage *croppedcannyimager = cvCreateImage(cvSize(rr.width,rr.height), 8, 1 );
 	cvSetImageROI(cannyimage,rr);
 	cvCopy(cannyimage,croppedcannyimager,0);
+	cvShowImage("result1",croppedcannyimagel);
+	cvShowImage("result",croppedcannyimager);
+
 	cvResetImageROI(cannyimage);
 	CvMemStorage* storagel = cvCreateMemStorage(0);
 	CvMemStorage* storager = cvCreateMemStorage(0);

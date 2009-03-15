@@ -1,10 +1,14 @@
 #include "Camera.h"
 #include "Detector.h"
 #include <cstdio>
+#include <iostream>
+#include <fstream>
 
 const char *WINDOW_NAME = "Display Window";
 const char *OUTPUT_FILE = "output.avi";
 const bool output_flag = true;
+const char *OUTPUT_FILE1 = "values.csv";
+std::ofstream filestream;
 
 void DrawFace(IplImage *img, Features &f, bool col = true) {
   static CvScalar colors[] = 
@@ -40,9 +44,9 @@ void DrawFace(IplImage *img, Features &f, bool col = true) {
 //  	cvCircle(img, cvPoint(f.pupils[0].x,f.pupils[0].y), 1, colors[3], 3, 8, 0);
 //  	cvCircle(img, cvPoint(f.pupils[1].x,f.pupils[1].y), 1, colors[3], 3, 8, 0);
 //
-//  	// draw eyebrow ends
-//  	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[4], 3, 8, 0);
-//  	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[4], 3, 8, 0);
+  	// draw eyebrow ends
+  	cvCircle(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), 1, colors[1], 3, 8, 0);
+  	cvCircle(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), 1, colors[1], 3, 8, 0);
 	  
 	cvEllipse(img,f.centers[0],f.sizes[0],f.theta*180/3.14,0,360,cvScalar(0,0,0),4,8,0);
 	  cvEllipse(img,f.centers[1],f.sizes[1],f.theta*180/3.14,0,360,cvScalar(0,0,0),4,8,0);
@@ -76,6 +80,7 @@ void DrawFace(IplImage *img, Features &f, bool col = true) {
   	cvLine(img, cvPoint(f.eyebrow_ends[0].x,f.eyebrow_ends[0].y), cvPoint(f.pupils[0].x,f.pupils[0].y), colors[5], 1);
   	cvLine(img, cvPoint(f.eyebrow_ends[1].x,f.eyebrow_ends[1].y), cvPoint(f.pupils[1].x,f.pupils[1].y), colors[5], 1);
 
+	  filestream<<","<<f.eyebrow_ends[0].x<<","<<f.eyebrow_ends[0].y<<","<<f.eyebrow_ends[1].x<<","<<f.eyebrow_ends[1].y<<","<<f.pupils[0].x<<","<<f.pupils[0].y<<","<<f.nose_bridge.x<<","<<f.nose_bridge.y<<","<<f.pupils[1].x<<","<<f.pupils[1].y<<","<<f.nostril_positions[0].x<<","<<f.nostril_positions[0].y<<","<<f.nostril_positions[1].x<<","<<f.nostril_positions[1].y<<","<<f.lip_positions[0].x<<","<<f.lip_positions[0].y<<","<<f.lip_positions[1].x<<","<<f.lip_positions[1].y;
   }
 }
 
@@ -102,7 +107,11 @@ int main(int argc, char **argv) {
   const char *filename = NULL;
   if(argc > 1)
     filename = argv[1];
-  
+filestream.open(OUTPUT_FILE1);
+	if (!filestream.is_open()) {
+		std::cout << "FILE OPEN FAIL" << std::endl;
+	}
+	
   cvNamedWindow (WINDOW_NAME, CV_WINDOW_AUTOSIZE);
   
   const IplImage *current_frame;
@@ -118,8 +127,11 @@ int main(int argc, char **argv) {
   if (output_flag) {
     vid_writer = cvCreateVideoWriter("/Users/ankit/Courses/CS223B/project/vgrp/temp.avi", CV_FOURCC('D', 'I', 'V', 'X'), 15,  cvSize(480, 360), 1);
   }
-  
+    int frameno = 1;
+
   while((current_frame = cam.GetFrame())) {
+	  filestream<<frameno;
+	  frameno++;
     cvResize(current_frame, small_img, CV_INTER_LINEAR);
     cvFlip(small_img, small_img, 1);
     cvCvtColor(small_img, gray, CV_BGR2GRAY);
@@ -146,7 +158,7 @@ int main(int argc, char **argv) {
     if(f.face_size) {
       DrawFace(small_img, f);
     }
-
+	  filestream<<std::endl;
     cvShowImage(WINDOW_NAME, small_img);
 	  char key = cvWaitKey(10);
 	  if(key == 't') {
@@ -175,8 +187,6 @@ int main(int argc, char **argv) {
 	  if((fabs(detector.speed[0]) > 2 && fabs(detector.speed[1]) > 2)) {
 		  docoldstart = true;  
 	  }
-<<<<<<< HEAD:vgrp.cpp
-=======
 	  if(key=='l') {
 		  f.rot_dir[0] = -1;
 	  }
@@ -193,9 +203,6 @@ int main(int argc, char **argv) {
 //		  f.rot_dir[0] = 0;
 //	  if(f.vert_rotation <0.1)
 //		  f.rot_dir[1] = 0;
-	  
-	  
->>>>>>> ec0692ba6c6ee5155269d7b149b2921de392a679:vgrp.cpp
 	  docoldstart = false;
   }
   
@@ -203,5 +210,6 @@ int main(int argc, char **argv) {
     cvReleaseVideoWriter(&vid_writer);
   cvReleaseImage( &gray );
   cvReleaseImage( &small_img );
+	filestream.close();
   return 0;
 }
