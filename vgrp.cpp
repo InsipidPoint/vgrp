@@ -6,7 +6,7 @@
 
 const char *WINDOW_NAME = "Display Window";
 const char *OUTPUT_FILE = "output.avi";
-const bool output_flag = true;
+const bool output_flag = false;
 const char *OUTPUT_FILE1 = "values.csv";
 std::ofstream filestream;
 
@@ -211,5 +211,7 @@ filestream.open(OUTPUT_FILE1);
   cvReleaseImage( &gray );
   cvReleaseImage( &small_img );
 	filestream.close();
+	
+	std::cout<<frameno<<std::endl;
   return 0;
 }

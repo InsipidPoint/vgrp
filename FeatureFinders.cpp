@@ -409,8 +409,6 @@ void Detector::FindEyebrowEnds(IplImage *img, Features& features) {
 	IplImage *croppedcannyimager = cvCreateImage(cvSize(rr.width,rr.height), 8, 1 );
 	cvSetImageROI(cannyimage,rr);
 	cvCopy(cannyimage,croppedcannyimager,0);
-	cvShowImage("result1",croppedcannyimagel);
-	cvShowImage("result",croppedcannyimager);
 
 	cvResetImageROI(cannyimage);
 	CvMemStorage* storagel = cvCreateMemStorage(0);
